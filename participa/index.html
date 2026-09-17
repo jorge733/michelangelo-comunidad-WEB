@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Participa | Michelangelo Comunidad</title>
+
+  <meta
+    name="description"
+    content="Comparte tus ideas, artículos, creaciones y propuestas con Michelangelo Comunidad."
+  >
+
+  <link
+    rel="icon"
+    type="image/jpeg"
+    href="../assets/logo-michelangelo.jpg"
+  >
+
+  <link
+    rel="stylesheet"
+    href="participa.css"
+  >
+</head>
+
+
+<body>
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="header">
+
+    <div class="header-container">
+
+      <a
+        href="../"
+        class="brand"
+        aria-label="Michelangelo Comunidad"
+      >
+
+        <img
+          src="../assets/logo-michelangelo.jpg"
+          alt="Michelangelo Colegio Waldorf"
+          class="brand-logo"
+        >
+
+        <div class="brand-community">
+
+          <span>COMUNIDAD</span>
+
+          <small>
+            Un espacio de estudiantes
+          </small>
+
+        </div>
+
+      </a>
+
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+
+      <nav
+        class="nav"
+        id="mainNav"
+      >
+
+        <a href="../">
+          Inicio
+        </a>
+
+        <a
+          href="https://periodicoescolarmichelangelo.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Periódico
+        </a>
+
+        <a href="../podcast/">
+          Podcast
+        </a>
+
+        <a href="../#creaciones">
+          Creaciones
+        </a>
+
+        <a href="../#vida">
+          Vida Michelangelo
+        </a>
+
+        <a
+          href="./"
+          class="nav-highlight active"
+        >
+          Participa
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="hero">
+
+      <div class="hero-shape shape-one"></div>
+      <div class="hero-shape shape-two"></div>
+      <div class="hero-shape shape-three"></div>
+
+
+      <div class="hero-container">
+
+        <p class="eyebrow">
+          MICHELANGELO COMUNIDAD
+        </p>
+
+        <h1>
+          Tu voz también es
+          <em>parte de Michelangelo.</em>
+        </h1>
+
+        <p class="hero-description">
+          Una idea puede convertirse en un artículo,
+          una conversación, una creación o incluso
+          en un nuevo proyecto.
+        </p>
+
+        <a
+          href="#participar"
+          class="hero-button"
+        >
+          Quiero participar
+          <span>↓</span>
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INTRO
+    ====================================================== -->
+
+    <section class="intro-section">
+
+      <div class="section-container intro-grid">
+
+        <div class="intro-number">
+          01
+        </div>
+
+
+        <div>
+
+          <p class="section-label">
+            PARTICIPA
+          </p>
+
+          <h2>
+            ¿Qué quieres
+            <em>compartir?</em>
+          </h2>
+
+        </div>
+
+
+        <div class="intro-copy">
+
+          <p>
+            Elige una categoría y cuéntanos tu propuesta.
+            Cada tipo de aporte tiene su propio formulario.
+          </p>
+
+          <p>
+            Lo que envíes será revisado antes de incorporarse
+            a Michelangelo Comunidad.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CATEGORÍAS
+    ====================================================== -->
+
+    <section
+      class="categories-section"
+      id="participar"
+    >
+
+      <div class="section-container">
+
+        <div class="category-grid">
+
+
+          <!-- PERIÓDICO -->
+
+          <button
+            class="category-card"
+            type="button"
+            data-category="periodico"
+          >
+
+            <div class="category-top">
+
+              <span class="category-number">
+                01
+              </span>
+
+              <span class="category-arrow">
+                ↗
+              </span>
+
+            </div>
+
+            <div class="category-icon">
+              ✎
+            </div>
+
+            <h3>
+              Escribir para
+              <span>el periódico</span>
+            </h3>
+
+            <p>
+              Propón una noticia, entrevista,
+              columna, reportaje o artículo.
+            </p>
+
+          </button>
+
+
+          <!-- CREACIÓN -->
+
+          <button
+            class="category-card"
+            type="button"
+            data-category="creacion"
+          >
+
+            <div class="category-top">
+
+              <span class="category-number">
+                02
+              </span>
+
+              <span class="category-arrow">
+                ↗
+              </span>
+
+            </div>
+
+            <div class="category-icon">
+              ◇
+            </div>
+
+            <h3>
+              Compartir
+              <span>una creación</span>
+            </h3>
+
+            <p>
+              Arte, fotografía, literatura,
+              música u otra creación.
+            </p>
+
+          </button>
+
+
+          <!-- PODCAST -->
+
+          <button
+            class="category-card"
+            type="button"
+            data-category="podcast"
+          >
+
+            <div class="category-top">
+
+              <span class="category-number">
+                03
+              </span>
+
+              <span class="category-arrow">
+                ↗
+              </span>
+
+            </div>
+
+            <div class="category-icon">
+              ◉
+            </div>
+
+            <h3>
+              Proponer un tema
+              <span>para el podcast</span>
+            </h3>
+
+            <p>
+              ¿Hay algo de lo que deberíamos
+              conversar en un próximo episodio?
+            </p>
+
+          </button>
+
+
+          <!-- IDEA -->
+
+          <button
+            class="category-card"
+            type="button"
+            data-category="idea"
+          >
+
+            <div class="category-top">
+
+              <span class="category-number">
+                04
+              </span>
+
+              <span class="category-arrow">
+                ↗
+              </span>
+
+            </div>
+
+            <div class="category-icon">
+              ✦
+            </div>
+
+            <h3>
+              Proponer
+              <span>una idea</span>
+            </h3>
+
+            <p>
+              ¿Tienes una propuesta para mejorar
+              o hacer crecer esta comunidad?
+            </p>
+
+          </button>
+
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FORMULARIO
+    ====================================================== -->
+
+    <section
+      class="form-section"
+      id="formSection"
+      aria-hidden="true"
+    >
+
+      <div class="form-container">
+
+
+        <!-- CABECERA -->
+
+        <div class="form-heading">
+
+          <button
+            class="close-form"
+            id="closeForm"
+            type="button"
+            aria-label="Cerrar formulario"
+          >
+            ×
+          </button>
+
+
+          <p
+            class="section-label"
+            id="formLabel"
+          >
+            PARTICIPA
+          </p>
+
+
+          <h2 id="formTitle">
+            Cuéntanos tu idea.
+          </h2>
+
+
+          <p id="formDescription">
+            Completa los siguientes datos.
+          </p>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+          id="participationForm"
+          novalidate
+        >
+
+          <input
+            type="hidden"
+            id="submissionType"
+            name="submissionType"
+          >
+
+
+          <!-- DATOS DEL ESTUDIANTE -->
+
+          <div class="form-block">
+
+            <div class="form-block-heading">
+
+              <span>01</span>
+
+              <div>
+                <h3>
+                  Sobre ti
+                </h3>
+
+                <p>
+                  Necesitamos algunos datos para poder
+                  contactarte respecto de tu propuesta.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="fields-grid">
+
+              <div class="field">
+
+                <label for="studentName">
+                  Nombre y apellido
+                  <span>*</span>
+                </label>
+
+                <input
+                  type="text"
+                  id="studentName"
+                  name="studentName"
+                  autocomplete="name"
+                  required
+                >
+
+              </div>
+
+
+              <div class="field">
+
+                <label for="course">
+                  Curso
+                  <span>*</span>
+                </label>
+
+                <select
+                  id="course"
+                  name="course"
+                  required
+                >
+
+                  <option value="">
+                    Selecciona tu curso
+                  </option>
+
+                  <option>7° Básico</option>
+                  <option>8° Básico</option>
+                  <option>I° Medio</option>
+                  <option>II° Medio</option>
+                  <option>III° Medio</option>
+                  <option>IV° Medio</option>
+                  <option>Otro</option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <label class="checkbox-row">
+
+              <input
+                type="checkbox"
+                id="anonymousPublic"
+                name="anonymousPublic"
+              >
+
+              <span class="custom-checkbox"></span>
+
+              <span>
+                Prefiero que mi nombre no aparezca
+                públicamente si este contenido se publica.
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <!-- CONTENIDO DINÁMICO -->
+
+          <div class="form-block">
+
+            <div class="form-block-heading">
+
+              <span>02</span>
+
+              <div>
+
+                <h3 id="contentHeading">
+                  Tu propuesta
+                </h3>
+
+                <p id="contentHelp">
+                  Cuéntanos lo que tienes en mente.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div
+              class="dynamic-fields"
+              id="dynamicFields"
+            ></div>
+
+          </div>
+
+
+          <!-- REVISIÓN -->
+
+          <div class="form-block review-block">
+
+            <div class="form-block-heading">
+
+              <span>03</span>
+
+              <div>
+
+                <h3>
+                  Antes de enviar
+                </h3>
+
+                <p>
+                  Queremos que sepas qué ocurrirá
+                  con tu propuesta.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="review-notice">
+
+              <strong>
+                Tu aporte no se publicará automáticamente.
+              </strong>
+
+              <p>
+                Será revisado antes de ser incorporado
+                a Michelangelo Comunidad. Si necesitamos
+                más información, podremos conversar contigo.
+              </p>
+
+            </div>
+
+
+            <label class="checkbox-row required-check">
+
+              <input
+                type="checkbox"
+                id="confirmSubmission"
+                name="confirmSubmission"
+                required
+              >
+
+              <span class="custom-checkbox"></span>
+
+              <span>
+                Confirmo que quiero enviar esta propuesta
+                para su revisión.
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <!-- MENSAJE ERROR -->
+
+          <div
+            class="form-message error-message"
+            id="errorMessage"
+            role="alert"
+          ></div>
+
+
+          <!-- BOTÓN -->
+
+          <div class="submit-area">
+
+            <button
+              type="submit"
+              class="submit-button"
+            >
+
+              <span>
+                Enviar propuesta
+              </span>
+
+              <strong>
+                →
+              </strong>
+
+            </button>
+
+
+            <p>
+              En esta primera versión el formulario
+              funciona como demostración y todavía
+              no envía información al servidor.
+            </p>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DEMO SUCCESS
+    ====================================================== -->
+
+    <section
+      class="success-screen"
+      id="successScreen"
+      aria-hidden="true"
+    >
+
+      <div class="success-content">
+
+        <div class="success-symbol">
+          ✓
+        </div>
+
+        <p class="section-label">
+          PROPUESTA PREPARADA
+        </p>
+
+        <h2>
+          ¡Gracias por
+          <em>participar!</em>
+        </h2>
+
+        <p>
+          El formulario funciona correctamente.
+          En el próximo paso conectaremos este sistema
+          con Michelangelo Studio para recibir
+          los aportes de verdad.
+        </p>
+
+
+        <button
+          type="button"
+          id="newSubmission"
+          class="new-submission"
+        >
+          Enviar otra propuesta →
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CIERRE
+    ====================================================== -->
+
+    <section class="closing-section">
+
+      <div class="section-container closing-grid">
+
+        <div>
+
+          <p class="section-label">
+            MICHELANGELO COMUNIDAD
+          </p>
+
+          <h2>
+            Una comunidad se construye
+            <em>cuando participamos.</em>
+          </h2>
+
+        </div>
+
+
+        <a
+          href="../"
+          class="back-link"
+        >
+
+          <span>
+            Volver al inicio
+          </span>
+
+          <strong>
+            →
+          </strong>
+
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="footer">
+
+    <div class="footer-container">
+
+      <div class="footer-top">
+
+        <div class="footer-brand">
+
+          <strong>
+            MICHELANGELO
+          </strong>
+
+          <span>
+            COMUNIDAD
+          </span>
+
+        </div>
+
+
+        <p>
+          Un espacio de participación y creación
+          de estudiantes de Michelangelo.
+        </p>
+
+      </div>
+
+
+      <div class="footer-links">
+
+        <a href="../">
+          Inicio
+        </a>
+
+        <a
+          href="https://periodicoescolarmichelangelo.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Periódico
+        </a>
+
+        <a href="../podcast/">
+          Podcast
+        </a>
+
+        <a href="../#creaciones">
+          Creaciones
+        </a>
+
+        <a href="./">
+          Participa
+        </a>
+
+        <a
+          href="https://michelangelo.cl/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Sitio oficial Michelangelo
+        </a>
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <span>
+          Michelangelo Comunidad
+        </span>
+
+        <span id="currentYear"></span>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <script src="participa.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Michelangelo Studio</title>
+
+  <meta
+    name="description"
+    content="Panel editorial de Michelangelo Comunidad."
+  >
+
+  <link
+    rel="icon"
+    type="image/jpeg"
+    href="../assets/logo-michelangelo.jpg"
+  >
+
+  <link rel="stylesheet" href="studio.css">
+</head>
+
+<body>
+
+  <!-- =====================================================
+       PANTALLA DE ACCESO
+  ====================================================== -->
+
+  <section class="login-screen" id="loginScreen">
+
+    <div class="login-panel">
+
+      <div class="login-brand">
+
+        <img
+          src="../assets/logo-michelangelo.jpg"
+          alt="Michelangelo Colegio Waldorf"
+        >
+
+        <div>
+          <span>MICHELANGELO</span>
+          <strong>STUDIO</strong>
+        </div>
+
+      </div>
+
+
+      <div class="login-content">
+
+        <p class="login-eyebrow">
+          ACCESO PRIVADO
+        </p>
+
+        <h1>
+          Panel
+          <em>editorial.</em>
+        </h1>
+
+        <p class="login-description">
+          Ingresa con tu cuenta autorizada para acceder
+          a Michelangelo Studio.
+        </p>
+
+
+        <form id="loginForm" class="login-form">
+
+          <div class="login-field">
+
+            <label for="loginEmail">
+              Correo electrónico
+            </label>
+
+            <input
+              type="email"
+              id="loginEmail"
+              autocomplete="email"
+              required
+            >
+
+          </div>
+
+
+          <div class="login-field">
+
+            <label for="loginPassword">
+              Contraseña
+            </label>
+
+            <input
+              type="password"
+              id="loginPassword"
+              autocomplete="current-password"
+              required
+            >
+
+          </div>
+
+
+          <p
+            class="login-error"
+            id="loginError"
+            role="alert"
+          ></p>
+
+
+          <button
+            type="submit"
+            class="login-button"
+            id="loginButton"
+          >
+            Entrar a Studio
+            <span>→</span>
+          </button>
+
+        </form>
+
+
+        <div class="login-footer">
+
+          <span>
+            Acceso exclusivo para usuarios autorizados.
+          </span>
+
+          <a href="../">
+            ← Volver a Michelangelo Comunidad
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       STUDIO
+  ====================================================== -->
+
+  <div
+    class="studio-shell"
+    id="studioShell"
+    hidden
+  >
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">
+
+        <img
+          src="../assets/logo-michelangelo.jpg"
+          alt="Michelangelo Colegio Waldorf"
+        >
+
+        <div>
+          <span>MICHELANGELO</span>
+          <strong>STUDIO</strong>
+        </div>
+
+      </div>
+
+
+      <nav class="sidebar-nav">
+
+        <button
+          class="nav-item active"
+          data-filter="todos"
+          type="button"
+        >
+          <span>⌂</span>
+          Panel general
+        </button>
+
+        <button
+          class="nav-item"
+          data-filter="periodico"
+          type="button"
+        >
+          <span>✎</span>
+          Periódico
+        </button>
+
+        <button
+          class="nav-item"
+          data-filter="creacion"
+          type="button"
+        >
+          <span>◇</span>
+          Creaciones
+        </button>
+
+        <button
+          class="nav-item"
+          data-filter="podcast"
+          type="button"
+        >
+          <span>◉</span>
+          Podcast
+        </button>
+
+        <button
+          class="nav-item"
+          data-filter="idea"
+          type="button"
+        >
+          <span>✦</span>
+          Ideas
+        </button>
+
+      </nav>
+
+
+      <div class="sidebar-bottom">
+
+        <div class="studio-status">
+
+          <span class="status-dot"></span>
+
+          <div>
+            <strong>Firebase conectado</strong>
+            <small id="sidebarUser">
+              Sesión iniciada
+            </small>
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="logout-button"
+          id="logoutButton"
+        >
+          Cerrar sesión
+        </button>
+
+
+        <a href="../">
+          ← Volver a Comunidad
+        </a>
+
+      </div>
+
+    </aside>
+
+
+
+    <!-- APP -->
+
+    <div class="app">
+
+      <!-- HEADER -->
+
+      <header class="topbar">
+
+        <div class="topbar-left">
+
+          <button
+            class="mobile-menu"
+            id="mobileMenu"
+            type="button"
+            aria-label="Abrir menú"
+          >
+            ☰
+          </button>
+
+          <div>
+
+            <span class="top-label">
+              MICHELANGELO COMUNIDAD
+            </span>
+
+            <h1>Studio</h1>
+
+          </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+          <div class="connection-badge">
+            <span></span>
+            CONECTADO
+          </div>
+
+          <div
+            class="editor-avatar"
+            id="editorAvatar"
+            title="Usuario de Studio"
+          >
+            M
+          </div>
+
+        </div>
+
+      </header>
+
+
+
+      <!-- MAIN -->
+
+      <main class="main">
+
+        <section class="welcome">
+
+          <div>
+
+            <p class="eyebrow">
+              PANEL EDITORIAL
+            </p>
+
+            <h2>
+              Aportes de la
+              <em>comunidad.</em>
+            </h2>
+
+          </div>
+
+          <p class="welcome-copy">
+            Revisa las propuestas recibidas, filtra los
+            contenidos y organiza su estado editorial.
+          </p>
+
+        </section>
+
+
+
+        <!-- STATS -->
+
+        <section class="stats">
+
+          <article class="stat-card">
+
+            <span>Total aportes</span>
+
+            <strong id="totalCount">
+              0
+            </strong>
+
+            <small>
+              Todos los contenidos
+            </small>
+
+          </article>
+
+
+          <article class="stat-card pending">
+
+            <span>Pendientes</span>
+
+            <strong id="pendingCount">
+              0
+            </strong>
+
+            <small>
+              Esperando revisión
+            </small>
+
+          </article>
+
+
+          <article class="stat-card reviewing">
+
+            <span>En revisión</span>
+
+            <strong id="reviewCount">
+              0
+            </strong>
+
+            <small>
+              En proceso editorial
+            </small>
+
+          </article>
+
+
+          <article class="stat-card approved">
+
+            <span>Aprobados</span>
+
+            <strong id="approvedCount">
+              0
+            </strong>
+
+            <small>
+              Listos para continuar
+            </small>
+
+          </article>
+
+        </section>
+
+
+
+        <!-- TOOLBAR -->
+
+        <section class="toolbar">
+
+          <div class="search-box">
+
+            <span>⌕</span>
+
+            <input
+              type="search"
+              id="searchInput"
+              placeholder="Buscar por título, nombre o curso..."
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div class="filters" id="filters">
+
+            <button
+              type="button"
+              class="filter active"
+              data-filter="todos"
+            >
+              Todos
+            </button>
+
+            <button
+              type="button"
+              class="filter"
+              data-filter="periodico"
+            >
+              Periódico
+            </button>
+
+            <button
+              type="button"
+              class="filter"
+              data-filter="creacion"
+            >
+              Creaciones
+            </button>
+
+            <button
+              type="button"
+              class="filter"
+              data-filter="podcast"
+            >
+              Podcast
+            </button>
+
+            <button
+              type="button"
+              class="filter"
+              data-filter="idea"
+            >
+              Ideas
+            </button>
+
+          </div>
+
+        </section>
+
+
+
+        <!-- LIST HEADER -->
+
+        <section class="list-heading">
+
+          <div>
+
+            <p class="eyebrow">
+              BANDEJA EDITORIAL
+            </p>
+
+            <h3 id="listTitle">
+              Todos los aportes
+            </h3>
+
+          </div>
+
+          <span id="visibleCount">
+            0 resultados
+          </span>
+
+        </section>
+
+
+
+        <!-- LOADING -->
+
+        <section
+          class="studio-loading"
+          id="studioLoading"
+        >
+
+          <div class="loading-spinner"></div>
+
+          <p>
+            Cargando aportes...
+          </p>
+
+        </section>
+
+
+
+        <!-- SUBMISSIONS -->
+
+        <section
+          class="submission-list"
+          id="submissionList"
+        ></section>
+
+
+
+        <!-- EMPTY -->
+
+        <section
+          class="empty-state"
+          id="emptyState"
+        >
+
+          <div>⌕</div>
+
+          <h3>
+            No encontramos aportes
+          </h3>
+
+          <p>
+            Prueba con otro término de búsqueda
+            o cambia el filtro.
+          </p>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       MODAL
+  ====================================================== -->
+
+  <div
+    class="modal-overlay"
+    id="modalOverlay"
+    aria-hidden="true"
+  >
+
+    <article
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+
+      <button
+        type="button"
+        class="modal-close"
+        id="modalClose"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <div class="modal-header">
+
+        <div class="modal-meta">
+
+          <span
+            class="type-badge"
+            id="modalType"
+          ></span>
+
+          <span
+            class="status-badge"
+            id="modalStatus"
+          ></span>
+
+        </div>
+
+
+        <h2 id="modalTitle"></h2>
+
+
+        <p
+          class="modal-author"
+          id="modalAuthor"
+        ></p>
+
+      </div>
+
+
+
+      <div class="modal-content">
+
+        <div class="detail-block">
+
+          <span>
+            PROPUESTA
+          </span>
+
+          <p id="modalDescription"></p>
+
+        </div>
+
+
+        <div
+          class="detail-block"
+          id="modalExtraBlock"
+        >
+
+          <span>
+            INFORMACIÓN ADICIONAL
+          </span>
+
+          <p id="modalExtra"></p>
+
+        </div>
+
+
+        <div class="detail-grid">
+
+          <div>
+
+            <span>
+              RECIBIDO
+            </span>
+
+            <strong id="modalDate"></strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              PUBLICACIÓN
+            </span>
+
+            <strong id="modalPrivacy"></strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="editorial-actions">
+
+        <p>
+          ESTADO EDITORIAL
+        </p>
+
+
+        <div class="status-actions">
+
+          <button
+            type="button"
+            data-status="pendiente"
+          >
+            Pendiente
+          </button>
+
+          <button
+            type="button"
+            data-status="revision"
+          >
+            En revisión
+          </button>
+
+          <button
+            type="button"
+            data-status="aprobado"
+          >
+            Aprobar
+          </button>
+
+          <button
+            type="button"
+            data-status="rechazado"
+          >
+            Rechazar
+          </button>
+
+        </div>
+
+
+        <small id="statusHelp">
+          Los cambios de estado se guardan
+          automáticamente en Michelangelo Comunidad.
+        </small>
+
+      </div>
+
+    </article>
+
+  </div>
+
+
+
+  <script src="studio.js"></script>
+
+</body>
+</html>
