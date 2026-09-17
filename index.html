@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Michelangelo Comunidad</title>
+
+  <meta
+    name="description"
+    content="Un espacio creado por estudiantes de Michelangelo para compartir, crear y participar."
+  >
+
+  <!-- FAVICON -->
+  <link
+    rel="icon"
+    type="image/jpeg"
+    href="assets/logo-michelangelo.jpg"
+  >
+
+  <!-- ESTILOS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+  <header class="header" id="inicio">
+    <div class="header-container">
+
+      <a
+        href="#inicio"
+        class="brand"
+        aria-label="Michelangelo Comunidad"
+      >
+        <img
+          src="assets/logo-michelangelo.jpg"
+          alt="Michelangelo Colegio Waldorf"
+          class="brand-logo"
+        >
+
+        <div class="brand-community">
+          <span>COMUNIDAD</span>
+          <small>Un espacio de estudiantes</small>
+        </div>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav">
+
+        <a href="#inicio">
+          Inicio
+        </a>
+
+        <a
+          href="https://periodicoescolarmichelangelo.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Periódico
+        </a>
+
+        <a href="#podcast">
+          Podcast
+        </a>
+
+        <a href="#creaciones">
+          Creaciones
+        </a>
+
+        <a href="#vida">
+          Vida Michelangelo
+        </a>
+
+        <a
+          href="#participa"
+          class="nav-highlight"
+        >
+          Participa
+        </a>
+
+      </nav>
+
+    </div>
+  </header>
+
+
+  <main>
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+    <section class="hero">
+
+      <div class="hero-decoration hero-decoration-one"></div>
+      <div class="hero-decoration hero-decoration-two"></div>
+
+      <div class="hero-content">
+
+        <p class="eyebrow">
+          UN ESPACIO DE NUESTRA COMUNIDAD
+        </p>
+
+        <h1>
+          Hecho por estudiantes.<br>
+          <span>Para nuestra comunidad.</span>
+        </h1>
+
+        <p class="hero-description">
+          Historias, conversaciones, arte, proyectos e ideas
+          que nacen dentro de Michelangelo.
+        </p>
+
+        <div class="hero-actions">
+
+          <a
+            href="#explora"
+            class="button button-primary"
+          >
+            Explorar comunidad
+          </a>
+
+          <a
+            href="#participa"
+            class="button button-secondary"
+          >
+            Quiero participar
+          </a>
+
+        </div>
+
+      </div>
+
+      <div class="scroll-indicator">
+        <span>DESCUBRE</span>
+        <div class="scroll-line"></div>
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         EXPLORA
+    ====================================================== -->
+    <section class="intro" id="explora">
+
+      <div class="section-container">
+
+        <div class="section-heading">
+
+          <p class="section-label">
+            NUESTRA COMUNIDAD
+          </p>
+
+          <h2>
+            Muchas formas de<br>
+            <em>hacernos escuchar.</em>
+          </h2>
+
+          <p>
+            Michelangelo Comunidad reúne iniciativas,
+            proyectos y expresiones creadas desde la mirada,
+            creatividad y participación de sus estudiantes.
+          </p>
+
+        </div>
+
+
+        <div class="projects-grid">
+
+          <!-- PERIÓDICO -->
+          <a
+            class="project-card newspaper-card"
+            href="https://periodicoescolarmichelangelo.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            <div class="project-number">
+              01
+            </div>
+
+            <div class="project-icon">
+              📰
+            </div>
+
+            <div class="project-content">
+
+              <p class="project-category">
+                INFORMAR · CONTAR · OPINAR
+              </p>
+
+              <h3>
+                Periódico<br>
+                Escolar
+              </h3>
+
+              <p>
+                Noticias, entrevistas, actividades,
+                historias y voces de nuestra comunidad escolar.
+              </p>
+
+              <span class="project-link">
+                Leer el periódico
+                <span>→</span>
+              </span>
+
+            </div>
+
+          </a>
+
+
+          <!-- PODCAST -->
+          <a
+            class="project-card podcast-card"
+            href="#podcast"
+          >
+
+            <div class="project-number">
+              02
+            </div>
+
+            <div class="project-icon">
+              🎙️
+            </div>
+
+            <div class="project-content">
+
+              <p class="project-category">
+                ESCUCHAR · CONVERSAR · PENSAR
+              </p>
+
+              <h3>
+                Michelangelo<br>
+                Podcast
+              </h3>
+
+              <p>
+                Conversaciones, historias y temas que nos
+                interesan, contados por estudiantes.
+              </p>
+
+              <span class="project-link">
+                Escuchar podcast
+                <span>→</span>
+              </span>
+
+            </div>
+
+          </a>
+
+
+          <!-- CREACIONES -->
+          <a
+            class="project-card creations-card"
+            href="#creaciones"
+          >
+
+            <div class="project-number">
+              03
+            </div>
+
+            <div class="project-icon">
+              🎨
+            </div>
+
+            <div class="project-content">
+
+              <p class="project-category">
+                CREAR · EXPRESAR · COMPARTIR
+              </p>
+
+              <h3>
+                Nuestras<br>
+                Creaciones
+              </h3>
+
+              <p>
+                Arte, fotografía, literatura, música
+                y proyectos creados por estudiantes.
+              </p>
+
+              <span class="project-link">
+                Descubrir creaciones
+                <span>→</span>
+              </span>
+
+            </div>
+
+          </a>
+
+
+          <!-- VIDA MICHELANGELO -->
+          <a
+            class="project-card community-card"
+            href="#vida"
+          >
+
+            <div class="project-number">
+              04
+            </div>
+
+            <div class="project-icon">
+              🌱
+            </div>
+
+            <div class="project-content">
+
+              <p class="project-category">
+                VIVIR · PARTICIPAR · RECORDAR
+              </p>
+
+              <h3>
+                Vida<br>
+                Michelangelo
+              </h3>
+
+              <p>
+                Actividades, iniciativas, proyectos
+                y momentos que forman parte de nuestra
+                vida escolar.
+              </p>
+
+              <span class="project-link">
+                Ver qué está pasando
+                <span>→</span>
+              </span>
+
+            </div>
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PODCAST
+    ====================================================== -->
+    <section
+      class="feature-section podcast-section"
+      id="podcast"
+    >
+
+      <div class="section-container feature-layout">
+
+        <div class="feature-text">
+
+          <p class="section-label">
+            MICHELANGELO PODCAST
+          </p>
+
+          <h2>
+            También tenemos<br>
+            <em>algo que decir.</em>
+          </h2>
+
+          <p>
+            Un espacio para conversar sobre aquello
+            que nos interesa, compartir experiencias
+            y escuchar distintas voces de nuestra comunidad.
+          </p>
+
+          <a
+            href="#"
+            class="text-link"
+          >
+            Conocer Michelangelo Podcast →
+          </a>
+
+        </div>
+
+
+        <div class="podcast-visual">
+
+          <div class="microphone">
+            🎙️
+          </div>
+
+          <div
+            class="sound-wave"
+            aria-hidden="true"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <p>
+            MICHELANGELO PODCAST
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CREACIONES
+    ====================================================== -->
+    <section
+      class="feature-section creations-section"
+      id="creaciones"
+    >
+
+      <div class="section-container">
+
+        <div class="section-heading centered">
+
+          <p class="section-label">
+            CREACIONES
+          </p>
+
+          <h2>
+            Lo que imaginamos<br>
+            <em>también merece un espacio.</em>
+          </h2>
+
+          <p>
+            Un lugar para mostrar aquello que hacemos,
+            imaginamos y creamos.
+          </p>
+
+        </div>
+
+
+        <div class="creation-categories">
+
+          <article class="creation-category">
+
+            <span>01</span>
+
+            <div class="creation-symbol">
+              ✦
+            </div>
+
+            <h3>
+              Arte
+            </h3>
+
+            <p>
+              Dibujo, pintura, ilustración
+              y otras expresiones visuales.
+            </p>
+
+          </article>
+
+
+          <article class="creation-category">
+
+            <span>02</span>
+
+            <div class="creation-symbol">
+              ◉
+            </div>
+
+            <h3>
+              Fotografía
+            </h3>
+
+            <p>
+              Miradas, lugares, personas
+              y momentos capturados por estudiantes.
+            </p>
+
+          </article>
+
+
+          <article class="creation-category">
+
+            <span>03</span>
+
+            <div class="creation-symbol">
+              ✎
+            </div>
+
+            <h3>
+              Literatura
+            </h3>
+
+            <p>
+              Cuentos, poesía, relatos,
+              reflexiones y textos originales.
+            </p>
+
+          </article>
+
+
+          <article class="creation-category">
+
+            <span>04</span>
+
+            <div class="creation-symbol">
+              ♫
+            </div>
+
+            <h3>
+              Música
+            </h3>
+
+            <p>
+              Interpretaciones, composiciones
+              y proyectos musicales.
+            </p>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         VIDA MICHELANGELO
+    ====================================================== -->
+    <section
+      class="feature-section life-section"
+      id="vida"
+    >
+
+      <div class="section-container feature-layout">
+
+        <div class="life-visual">
+
+          <div class="life-word">
+            <span>V</span>
+            <span>I</span>
+            <span>D</span>
+            <span>A</span>
+          </div>
+
+        </div>
+
+
+        <div class="feature-text">
+
+          <p class="section-label">
+            VIDA MICHELANGELO
+          </p>
+
+          <h2>
+            Las cosas que pasan<br>
+            <em>también hacen historia.</em>
+          </h2>
+
+          <p>
+            Actividades, celebraciones, proyectos,
+            iniciativas y pequeños momentos que construyen
+            nuestra experiencia en Michelangelo.
+          </p>
+
+          <a
+            href="#"
+            class="text-link"
+          >
+            Explorar la comunidad →
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PARTICIPA
+    ====================================================== -->
+    <section
+      class="participate"
+      id="participa"
+    >
+
+      <div class="participate-inner">
+
+        <p class="section-label">
+          TU VOZ TAMBIÉN CUENTA
+        </p>
+
+        <h2>
+          Esto también puede<br>
+          <em>ser creado por ti.</em>
+        </h2>
+
+        <p>
+          ¿Tienes una historia, una fotografía,
+          un dibujo, una idea, una canción o un tema
+          que debería aparecer en el podcast?
+        </p>
+
+
+        <div class="participate-options">
+
+          <a href="participa/">
+            <span>📰</span>
+            Enviar un artículo
+          </a>
+
+          <a href="participa/">
+            <span>🎨</span>
+            Compartir una creación
+          </a>
+
+          <a href="participa/">
+            <span>🎙️</span>
+            Proponer un tema
+          </a>
+
+          <a href="participa/">
+            <span>💡</span>
+            Enviar una idea
+          </a>
+
+        </div>
+
+
+        <a
+          href="participa/"
+          class="button button-light"
+        >
+          Quiero participar
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+  <footer class="footer">
+
+    <div class="footer-container">
+
+      <div class="footer-brand">
+
+        <strong>
+          MICHELANGELO
+        </strong>
+
+        <span>
+          COMUNIDAD
+        </span>
+
+      </div>
+
+
+      <p>
+        Un espacio de participación y creación
+        de estudiantes de Michelangelo.
+      </p>
+
+
+      <div class="footer-links">
+
+        <a href="#inicio">
+          Inicio
+        </a>
+
+        <a
+          href="https://periodicoescolarmichelangelo.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Periódico
+        </a>
+
+        <a href="#podcast">
+          Podcast
+        </a>
+
+        <a href="#creaciones">
+          Creaciones
+        </a>
+
+        <a href="#participa">
+          Participa
+        </a>
+
+        <a
+          href="https://michelangelo.cl/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Sitio oficial Michelangelo
+        </a>
+
+      </div>
+
+
+      <div class="footer-bottom">
+
+        <span>
+          Michelangelo Comunidad
+        </span>
+
+        <span id="currentYear"></span>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <script src="js/app.js"></script>
+
+</body>
+</html>
