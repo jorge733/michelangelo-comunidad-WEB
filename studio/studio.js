@@ -1740,6 +1740,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       const attachment = item.raw?.detalles?.archivo || null;
+      const imageUrl = attachment?.ruta
+        ? await getDownloadURL(storageRef(storage, attachment.ruta))
+        : null;
 
       await addDoc(collection(db, "publicaciones"), {
         seccion: "creaciones",
@@ -1748,6 +1751,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         descripcion: item.description,
         autor: item.anonymous ? "Anónimo" : item.realName,
         archivo: attachment,
+        imagenUrl: imageUrl,
         publicadoEn: new Date()
       });
 
