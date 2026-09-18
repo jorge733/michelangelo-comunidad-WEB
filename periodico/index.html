@@ -8,18 +8,24 @@
   <link rel="icon" href="../assets/logo-michelangelo.jpg">
   <link rel="stylesheet" href="../css/styles.css">
   <style>
-    .reader-page{min-height:100vh;background:#f4eee3}.reader-header{max-width:1360px;margin:auto;padding:22px 5%;display:flex;align-items:center;justify-content:space-between;gap:22px}.reader-back{font-size:.78rem;font-weight:700}.reader-brand{display:flex;align-items:center;gap:12px;text-align:center}.reader-brand img{width:46px;height:46px;object-fit:contain;border-radius:5px}.reader-brand strong{display:block;font-family:var(--serif,Georgia,serif);font-size:1.4rem}.reader-brand span{display:block;margin-top:3px;color:var(--terracotta,#b76549);font-size:.58rem;font-weight:700;letter-spacing:.16em}.reader-note{color:var(--ink-soft,#596057);font-size:.7rem}.embedded-reader{width:100%;height:calc(100vh - 91px);min-height:730px;display:block;border:0;background:#fff}@media(max-width:650px){.reader-header{padding:14px 5%;justify-content:center}.reader-back,.reader-note{display:none}.embedded-reader{height:calc(100vh - 76px);min-height:650px}.reader-brand strong{font-size:1.15rem}}
+    .reader-page{min-height:100vh;background:#f4eee3}.periodico-frame{height:calc(100vh - 101px);min-height:670px;overflow:hidden}.embedded-reader{width:100%;height:calc(100% + 89px);margin-top:-89px;display:block;border:0;background:#fff}@media(max-width:720px){.periodico-frame{height:calc(100vh - 86px);min-height:610px}.embedded-reader{height:calc(100% + 78px);margin-top:-78px}}
   </style>
 </head>
 <body class="reader-page">
-  <header class="reader-header">
-    <a class="reader-back" href="../">← Volver a Comunidad</a>
-    <div class="reader-brand">
-      <img src="../assets/logo-michelangelo.jpg" alt="Colegio Waldorf Michelangelo">
-      <div><strong>Periódico Escolar</strong><span>MICHELANGELO COMUNIDAD</span></div>
+  <a class="skip-link" href="#lector">Saltar al lector del periódico</a>
+  <header class="header">
+    <div class="header-container">
+      <a href="../" class="brand" aria-label="Michelangelo Comunidad">
+        <img src="../assets/logo-michelangelo.jpg" alt="Michelangelo Colegio Waldorf" class="brand-logo">
+        <div class="brand-community"><span>COMUNIDAD</span><small>Un espacio de estudiantes</small></div>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación" aria-controls="mainNav" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="nav" id="mainNav">
+        <a href="../">Inicio</a><a href="./" class="active">Periódico</a><a href="../podcast/">Podcast</a><a href="../creaciones/">Creaciones</a><a href="../vida/">Vida Michelangelo</a><a href="../participa/" class="nav-highlight">Participa</a>
+      </nav>
     </div>
-    <span class="reader-note">Lector integrado</span>
   </header>
-  <iframe class="embedded-reader" src="https://periodicoescolarmichelangelo.vercel.app/" title="Lector del Periódico Escolar Michelangelo" allow="fullscreen" referrerpolicy="strict-origin-when-cross-origin">Tu navegador no permite mostrar el lector integrado.</iframe>
+  <main class="periodico-frame" id="lector"><iframe class="embedded-reader" src="https://periodicoescolarmichelangelo.vercel.app/" title="Lector del Periódico Escolar Michelangelo" allow="fullscreen" referrerpolicy="strict-origin-when-cross-origin">Tu navegador no permite mostrar el lector integrado.</iframe></main>
+  <script src="../js/app.js"></script>
 </body>
 </html>
