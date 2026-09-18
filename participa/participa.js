@@ -13,16 +13,22 @@ const firebaseConfig = {
 
 const firebaseReady = Promise.all([
   import("https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js"),
-  import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js")
-]).then(([firebaseApp, firestore]) => {
+  import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"),
+  import("https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js")
+]).then(([firebaseApp, firestore, storageModule]) => {
   const app = firebaseApp.initializeApp(firebaseConfig);
   const db = firestore.getFirestore(app);
+  const storage = storageModule.getStorage(app);
 
   return {
     db,
-    addDoc: firestore.addDoc,
+    doc: firestore.doc,
+    setDoc: firestore.setDoc,
     collection: firestore.collection,
-    serverTimestamp: firestore.serverTimestamp
+    serverTimestamp: firestore.serverTimestamp,
+    storage,
+    storageRef: storageModule.ref,
+    uploadBytes: storageModule.uploadBytes
   };
 });
 
@@ -1495,9 +1501,13 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const {
           db,
-          addDoc,
+          doc,
+          setDoc,
           collection,
-          serverTimestamp
+          serverTimestamp,
+          storage,
+          storageRef,
+          uploadBytes
         } = await firebaseReady;
 
         const formData = new FormData(form);
@@ -1548,6 +1558,32 @@ document.addEventListener("DOMContentLoaded", () => {
         const details =
           buildDetails(type, formData);
 
+        const creationFile =
+          type === "creacion"
+            ? form.elements.creationFile?.files?.[0]
+            : null;
+
+        if (creationFile) {
+          const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+          if (!allowedTypes.includes(creationFile.type) || creationFile.size > 10 * 1024 * 1024) {
+            throw new Error("La foto debe ser JPG, PNG o WebP y pesar como máximo 10 MB.");
+          }
+        }
+
+        const aporteReference =
+          doc(collection(db, "aportes"));
+
+        if (creationFile) {
+          const extension = creationFile.name.split(".").pop().toLowerCase();
+          details.archivo = {
+            ruta: `aportes/${aporteReference.id}/fotografias/creacion.${extension}`,
+            nombre: creationFile.name,
+            tipo: creationFile.type,
+            tamano: creationFile.size
+          };
+        }
+
         const aporte = {
           tipo: type,
           nombre: name || "Estudiante",
@@ -1561,10 +1597,15 @@ document.addEventListener("DOMContentLoaded", () => {
           creadoEn: serverTimestamp()
         };
 
-        await addDoc(
-          collection(db, "aportes"),
-          aporte
-        );
+        await setDoc(aporteReference, aporte);
+
+        if (creationFile) {
+          await uploadBytes(
+            storageRef(storage, details.archivo.ruta),
+            creationFile,
+            { contentType: creationFile.type }
+          );
+        }
 
         formSection.classList.remove("active");
 
@@ -1593,7 +1634,7 @@ document.addEventListener("DOMContentLoaded", () => {
           error
         );
 
-        errorMessage.textContent =
+        errorMessage.textContent = error.message ||
           "No pudimos enviar tu propuesta. Inténtalo nuevamente en unos momentos.";
 
         errorMessage.classList.add("active");
