@@ -520,12 +520,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   function showFatalLoginError(message) {
+    const loginErrorElement =
+      document.getElementById("loginError");
 
-    if (!loginError) {
+    if (!loginErrorElement) {
       return;
     }
-
-    showLoginError(message);
+    loginErrorElement.textContent = message;
+    loginErrorElement.classList.add("active");
 
   }
 

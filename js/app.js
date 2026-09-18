@@ -34,6 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
         isOpen ? "true" : "false"
       );
 
+      menuToggle.setAttribute(
+        "aria-label",
+        isOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación"
+      );
+
     });
 
 
@@ -50,11 +55,22 @@ document.addEventListener("DOMContentLoaded", () => {
           "false"
         );
 
+        menuToggle.setAttribute("aria-label", "Abrir menú de navegación");
+
       });
 
     });
 
   }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && mainNav?.classList.contains("active")) {
+      mainNav.classList.remove("active");
+      menuToggle?.setAttribute("aria-expanded", "false");
+      menuToggle?.setAttribute("aria-label", "Abrir menú de navegación");
+      menuToggle?.focus();
+    }
+  });
 
 
   /* =========================
