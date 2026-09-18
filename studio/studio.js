@@ -23,7 +23,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   let signOut;
 
   let collection;
+  let addDoc;
+  let getDocs;
   let onSnapshot;
+  let query;
+  let where;
   let doc;
   let updateDoc;
   let storage;
@@ -78,8 +82,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     collection =
       firebaseFirestoreModule.collection;
 
+    addDoc = firebaseFirestoreModule.addDoc;
+    getDocs = firebaseFirestoreModule.getDocs;
+
     onSnapshot =
       firebaseFirestoreModule.onSnapshot;
+
+    query = firebaseFirestoreModule.query;
+    where = firebaseFirestoreModule.where;
 
     doc =
       firebaseFirestoreModule.doc;
@@ -293,6 +303,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const statusHelp =
     document.getElementById("statusHelp");
+
+  const publishCreationButton =
+    document.getElementById("publishCreationButton");
 
 
 
@@ -1466,6 +1479,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     );
 
+    publishCreationButton.hidden = !(
+      item.type === "creacion" && item.status === "aprobado"
+    );
+
   }
 
 
@@ -1701,6 +1718,49 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
 
+
+  publishCreationButton.addEventListener("click", async () => {
+    const item = submissions.find(submission => submission.id === currentSubmissionId);
+
+    if (!item || item.type !== "creacion" || item.status !== "aprobado") {
+      return;
+    }
+
+    publishCreationButton.disabled = true;
+    publishCreationButton.textContent = "Publicando...";
+
+    try {
+      const existing = await getDocs(
+        query(collection(db, "publicaciones"), where("aporteId", "==", item.id))
+      );
+
+      if (!existing.empty) {
+        statusHelp.textContent = "Esta creación ya fue publicada.";
+        return;
+      }
+
+      const attachment = item.raw?.detalles?.archivo || null;
+
+      await addDoc(collection(db, "publicaciones"), {
+        seccion: "creaciones",
+        aporteId: item.id,
+        titulo: item.title,
+        descripcion: item.description,
+        autor: item.anonymous ? "Anónimo" : item.realName,
+        archivo: attachment,
+        publicadoEn: new Date()
+      });
+
+      statusHelp.textContent = "Creación publicada correctamente.";
+      publishCreationButton.hidden = true;
+    } catch (error) {
+      console.error("No fue posible publicar la creación:", error);
+      statusHelp.textContent = "No fue posible publicar la creación. Inténtalo nuevamente.";
+    } finally {
+      publishCreationButton.disabled = false;
+      publishCreationButton.textContent = "Publicar en Creaciones";
+    }
+  });
 
   /* =====================================================
      MOBILE SIDEBAR
