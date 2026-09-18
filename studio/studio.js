@@ -376,37 +376,53 @@ document.addEventListener("DOMContentLoaded", async () => {
       data.detalles || {};
 
 
-    if (details.articleType) {
+    const articleType =
+      details.tipoContenido ||
+      details.articleType;
+
+    const articleStatus =
+      details.etapa ||
+      details.articleStatus;
+
+    const creationType =
+      details.tipoCreacion ||
+      details.creationType;
+
+    const ideaReason =
+      details.porQueInteresante ||
+      details.ideaReason;
+
+    if (articleType) {
 
       parts.push(
-        `Tipo de contenido: ${details.articleType}`
+        `Tipo de contenido: ${articleType}`
       );
 
     }
 
 
-    if (details.articleStatus) {
+    if (articleStatus) {
 
       parts.push(
-        `Estado del contenido: ${details.articleStatus}`
+        `Estado del contenido: ${articleStatus}`
       );
 
     }
 
 
-    if (details.creationType) {
+    if (creationType) {
 
       parts.push(
-        `Tipo de creación: ${details.creationType}`
+        `Tipo de creación: ${creationType}`
       );
 
     }
 
 
-    if (details.ideaReason) {
+    if (ideaReason) {
 
       parts.push(
-        `Motivación: ${details.ideaReason}`
+        `Motivación: ${ideaReason}`
       );
 
     }
