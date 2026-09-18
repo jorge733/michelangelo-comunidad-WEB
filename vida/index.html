@@ -1,1 +1,34 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vida Michelangelo</title><style>body{margin:0;background:#faf7f0;color:#25312b;font:18px Arial}main{max-width:900px;margin:auto;padding:12vh 6%}a{color:inherit}p{line-height:1.6}h1{font:clamp(3rem,9vw,6rem) Georgia,serif;margin:.4em 0}.box{background:#fffdf8;padding:2rem;border-radius:18px}</style></head><body><main><a href="../">← Comunidad</a><p>VIDA MICHELANGELO</p><h1>Las cosas que pasan también hacen historia.</h1><section class="box"><h2>Próximamente</h2><p>Este espacio reunirá actividades, proyectos e iniciativas aprobadas por la comunidad editorial.</p></section></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Vida Michelangelo: videos y momentos publicados por la comunidad.">
+  <title>Vida Michelangelo | Michelangelo Comunidad</title>
+  <link rel="icon" href="../assets/logo-michelangelo.jpg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .public-page{max-width:1120px;margin:auto;padding:48px 5% 90px}.public-back{display:inline-block;margin-bottom:42px;font-weight:700}.public-hero{max-width:810px;margin-bottom:52px}.public-hero h1{font-family:var(--serif,Georgia,serif);font-size:clamp(3.2rem,8vw,6.5rem);line-height:.95;letter-spacing:-.05em}.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px}.video-card{border:1px solid var(--border,#ded8cf);background:var(--paper,#fffdf8)}.video-card video{width:100%;display:block;background:#202522;aspect-ratio:16/9}.video-copy{padding:20px}.video-card h2{font-family:var(--serif,Georgia,serif);font-size:1.7rem;line-height:1.05}.video-card p{margin:10px 0 16px;color:var(--ink-soft,#596057);line-height:1.55}.video-card small{color:var(--terracotta,#b76549);font-weight:700}.public-state{padding:32px;border:1px solid var(--border,#ded8cf);background:var(--paper,#fffdf8);line-height:1.6}.public-state.error{border-color:#b76549;color:#8c4c36}
+  </style>
+</head>
+<body>
+  <main class="public-page">
+    <a class="public-back" href="../">← Comunidad</a>
+    <header class="public-hero"><p class="eyebrow">VIDA MICHELANGELO</p><h1>Las cosas que pasan también hacen historia.</h1></header>
+    <section id="list" class="video-grid" aria-live="polite"><p class="public-state">Cargando publicaciones…</p></section>
+  </main>
+  <script type="module">
+    const config={apiKey:"AIzaSyDWSpVS8It00pQXE7I541w-ywTu6mvphIM",authDomain:"michelangelo-comunidad.firebaseapp.com",projectId:"michelangelo-comunidad"};
+    const list=document.querySelector('#list');
+    const [{initializeApp},{getFirestore,collection,onSnapshot}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js')]);
+    const db=getFirestore(initializeApp(config));
+    const state=(message,error=false)=>{list.replaceChildren();const node=document.createElement('p');node.className=`public-state${error?' error':''}`;node.textContent=message;list.append(node)};
+    onSnapshot(collection(db,'publicaciones'),snapshot=>{
+      const items=snapshot.docs.map(doc=>doc.data()).filter(item=>item.seccion==='vida'&&item.videoUrl);list.replaceChildren();
+      if(!items.length){state('Aún no hay videos publicados. Vuelve pronto para acompañar la vida de Michelangelo.');return}
+      items.sort((a,b)=>(b.publicadoEn?.seconds||0)-(a.publicadoEn?.seconds||0));
+      for(const item of items){const card=document.createElement('article');card.className='video-card';const video=document.createElement('video');video.src=item.videoUrl;video.controls=true;video.preload='metadata';const copy=document.createElement('div');copy.className='video-copy';const title=document.createElement('h2');title.textContent=item.titulo||'Sin título';const description=document.createElement('p');description.textContent=item.descripcion||'';const author=document.createElement('small');author.textContent=item.autor||'Michelangelo Comunidad';copy.append(title,description,author);card.append(video,copy);list.append(card)}
+    },()=>state('No fue posible cargar Vida Michelangelo. Inténtalo nuevamente en unos minutos.',true));
+  </script>
+</body>
+</html>

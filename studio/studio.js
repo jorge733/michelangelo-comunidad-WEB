@@ -33,6 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let storage;
   let storageRef;
   let getDownloadURL;
+  let uploadBytes;
+  let serverTimestamp;
 
 
   try {
@@ -99,6 +101,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     storageRef = firebaseStorageModule.ref;
     getDownloadURL = firebaseStorageModule.getDownloadURL;
+    uploadBytes = firebaseStorageModule.uploadBytes;
+    serverTimestamp = firebaseFirestoreModule.serverTimestamp;
 
 
   } catch (error) {
@@ -208,6 +212,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const editorAvatar =
     document.getElementById("editorAvatar");
+
+  const videoPublishForm = document.getElementById("videoPublishForm");
+  const videoTitle = document.getElementById("videoTitle");
+  const videoDescription = document.getElementById("videoDescription");
+  const videoFile = document.getElementById("videoFile");
+  const videoPublishButton = document.getElementById("videoPublishButton");
+  const videoPublishMessage = document.getElementById("videoPublishMessage");
 
   const studioLoading =
     document.getElementById("studioLoading");
@@ -1454,16 +1465,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (attachment?.ruta) {
       modalAttachment.textContent = "Cargando archivo adjunto...";
       modalAttachment.removeAttribute("href");
+      modalAttachment.dataset.path = attachment.ruta;
 
       getDownloadURL(storageRef(storage, attachment.ruta))
         .then(url => {
+          if (modalAttachment.dataset.path !== attachment.ruta) return;
           modalAttachment.href = url;
           modalAttachment.textContent = attachment.nombre || "Abrir archivo adjunto";
         })
         .catch(error => {
           console.error("No fue posible cargar el adjunto:", error);
+          if (modalAttachment.dataset.path !== attachment.ruta) return;
           modalAttachment.textContent = "No fue posible abrir el archivo adjunto.";
         });
+    } else {
+      delete modalAttachment.dataset.path;
     }
 
 
@@ -1752,7 +1768,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         autor: item.anonymous ? "Anónimo" : item.realName,
         archivo: attachment,
         imagenUrl: imageUrl,
-        publicadoEn: new Date()
+        publicadoEn: serverTimestamp()
       });
 
       statusHelp.textContent = "Creación publicada correctamente.";
@@ -1763,6 +1779,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     } finally {
       publishCreationButton.disabled = false;
       publishCreationButton.textContent = "Publicar en Creaciones";
+    }
+  });
+
+  videoPublishForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const file = videoFile.files?.[0];
+    const allowedTypes = ["video/mp4", "video/webm"];
+
+    if (!file || !allowedTypes.includes(file.type) || file.size > 250 * 1024 * 1024) {
+      videoPublishMessage.textContent = "Selecciona un video MP4 o WebM de hasta 250 MB.";
+      return;
+    }
+
+    videoPublishButton.disabled = true;
+    videoPublishButton.textContent = "Subiendo video…";
+    videoPublishMessage.textContent = "La carga puede tardar unos minutos. No cierres esta página.";
+
+    try {
+      const extension = file.name.split(".").pop().toLowerCase();
+      const objectId = doc(collection(db, "publicaciones")).id;
+      const path = `publicaciones/${objectId}/videos/video.${extension}`;
+      const videoReference = storageRef(storage, path);
+
+      await uploadBytes(videoReference, file, { contentType: file.type });
+      const videoUrl = await getDownloadURL(videoReference);
+
+      await addDoc(collection(db, "publicaciones"), {
+        seccion: "vida",
+        titulo: videoTitle.value.trim(),
+        descripcion: videoDescription.value.trim(),
+        autor: "Michelangelo Comunidad",
+        archivo: { ruta: path, nombre: file.name, tipo: file.type, tamano: file.size },
+        videoUrl,
+        publicadoEn: serverTimestamp()
+      });
+
+      videoPublishForm.reset();
+      videoPublishMessage.textContent = "Video publicado correctamente en Vida Michelangelo.";
+    } catch (error) {
+      console.error("No fue posible publicar el video:", error);
+      videoPublishMessage.textContent = "No fue posible publicar el video. Revisa la conexión e inténtalo nuevamente.";
+    } finally {
+      videoPublishButton.disabled = false;
+      videoPublishButton.textContent = "Publicar video";
     }
   });
 

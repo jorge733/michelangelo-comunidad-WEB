@@ -330,6 +330,21 @@
 
 
 
+        <section class="video-publisher" aria-labelledby="videoPublisherTitle">
+          <div>
+            <p class="eyebrow">VIDA MICHELANGELO</p>
+            <h3 id="videoPublisherTitle">Publicar video del encargado de fotografía</h3>
+            <p>Este acceso es privado: el video se publica solamente al confirmar este formulario.</p>
+          </div>
+          <form id="videoPublishForm" class="video-publish-form">
+            <label>Título<input id="videoTitle" required maxlength="120"></label>
+            <label>Descripción<textarea id="videoDescription" required maxlength="800"></textarea></label>
+            <label>Archivo MP4 o WebM (máx. 250 MB)<input id="videoFile" type="file" accept="video/mp4,video/webm" required></label>
+            <button type="submit" class="button-primary" id="videoPublishButton">Publicar video</button>
+            <p id="videoPublishMessage" class="video-publish-message" role="status"></p>
+          </form>
+        </section>
+
         <!-- STATS -->
 
         <section class="stats">

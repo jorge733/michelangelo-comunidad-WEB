@@ -14,11 +14,13 @@ const firebaseConfig = {
 const firebaseReady = Promise.all([
   import("https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js"),
   import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"),
-  import("https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js")
-]).then(([firebaseApp, firestore, storageModule]) => {
+  import("https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js"),
+  import("https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js")
+]).then(([firebaseApp, firestore, storageModule, authModule]) => {
   const app = firebaseApp.initializeApp(firebaseConfig);
   const db = firestore.getFirestore(app);
   const storage = storageModule.getStorage(app);
+  const auth = authModule.getAuth(app);
 
   return {
     db,
@@ -28,7 +30,9 @@ const firebaseReady = Promise.all([
     serverTimestamp: firestore.serverTimestamp,
     storage,
     storageRef: storageModule.ref,
-    uploadBytes: storageModule.uploadBytes
+    uploadBytes: storageModule.uploadBytes,
+    auth,
+    signInAnonymously: authModule.signInAnonymously
   };
 });
 
@@ -657,9 +661,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
           <p>
 
-            Esta opción se habilitará completamente
+            Puedes adjuntar una fotografía JPG, PNG o WebP de hasta 10 MB.
 
-            cuando conectemos el almacenamiento del sitio.
+            Será revisada por el equipo editorial antes de publicarse.
 
           </p>
 
@@ -673,7 +677,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             name="creationFile"
 
-            accept="image/*,audio/*,video/*,.pdf,.doc,.docx"
+            accept="image/jpeg,image/png,image/webp"
 
           >
 
@@ -1507,7 +1511,9 @@ document.addEventListener("DOMContentLoaded", () => {
           serverTimestamp,
           storage,
           storageRef,
-          uploadBytes
+          uploadBytes,
+          auth,
+          signInAnonymously
         } = await firebaseReady;
 
         const formData = new FormData(form);
@@ -1597,15 +1603,19 @@ document.addEventListener("DOMContentLoaded", () => {
           creadoEn: serverTimestamp()
         };
 
-        await setDoc(aporteReference, aporte);
-
         if (creationFile) {
+          if (!auth.currentUser) {
+            await signInAnonymously(auth);
+          }
           await uploadBytes(
             storageRef(storage, details.archivo.ruta),
             creationFile,
             { contentType: creationFile.type }
           );
         }
+
+        // Solo registramos el aporte cuando su foto privada ya se cargó.
+        await setDoc(aporteReference, aporte);
 
         formSection.classList.remove("active");
 
