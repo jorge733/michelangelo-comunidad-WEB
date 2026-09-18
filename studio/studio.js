@@ -26,6 +26,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let onSnapshot;
   let doc;
   let updateDoc;
+  let storage;
+  let storageRef;
+  let getDownloadURL;
 
 
   try {
@@ -42,6 +45,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"
     );
 
+    const firebaseStorageModule = await import(
+      "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js"
+    );
+
 
     firebaseApp =
       firebaseAppModule.initializeApp(firebaseConfig);
@@ -53,6 +60,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     db =
       firebaseFirestoreModule.getFirestore(firebaseApp);
+
+    storage =
+      firebaseStorageModule.getStorage(firebaseApp);
 
 
     signInWithEmailAndPassword =
@@ -76,6 +86,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     updateDoc =
       firebaseFirestoreModule.updateDoc;
+
+    storageRef = firebaseStorageModule.ref;
+    getDownloadURL = firebaseStorageModule.getDownloadURL;
 
 
   } catch (error) {
@@ -260,6 +273,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const modalPrivacy =
     document.getElementById("modalPrivacy");
+
+  const modalAttachmentBlock =
+    document.getElementById("modalAttachmentBlock");
+
+  const modalAttachment =
+    document.getElementById("modalAttachment");
 
   const statusButtons =
     document.querySelectorAll(
@@ -457,6 +476,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       id:
         firestoreDoc.id,
+
+      raw: data,
 
       type:
         data.tipo || "idea",
@@ -1412,6 +1433,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       item.anonymous
         ? "Publicar de forma anónima"
         : "Puede aparecer su nombre";
+
+    const attachment = item.raw?.detalles?.archivo;
+
+    modalAttachmentBlock.hidden = !attachment?.ruta;
+
+    if (attachment?.ruta) {
+      modalAttachment.textContent = "Cargando archivo adjunto...";
+      modalAttachment.removeAttribute("href");
+
+      getDownloadURL(storageRef(storage, attachment.ruta))
+        .then(url => {
+          modalAttachment.href = url;
+          modalAttachment.textContent = attachment.nombre || "Abrir archivo adjunto";
+        })
+        .catch(error => {
+          console.error("No fue posible cargar el adjunto:", error);
+          modalAttachment.textContent = "No fue posible abrir el archivo adjunto.";
+        });
+    }
 
 
     statusButtons.forEach(
