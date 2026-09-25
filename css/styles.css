@@ -1430,3 +1430,27 @@ img {
   }
 
 }
+
+
+/* =========================================================
+   ENLACE A LINEAMIENTOS
+========================================================= */
+
+.participate-guidelines {
+  display: block;
+
+  margin-top: 26px;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.5);
+  text-underline-offset: 4px;
+}
+
+.participate-guidelines:hover {
+  color: #fff;
+}

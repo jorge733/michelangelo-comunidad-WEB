@@ -1,0 +1,726 @@
+/* =========================================================
+   MICHELANGELO COMUNIDAD
+   lineamientos.css
+========================================================= */
+
+html {
+  scroll-padding-top: 120px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.guide-hero {
+  padding: 190px 5% 110px;
+
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(196, 154, 80, 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(82, 107, 88, 0.14),
+      transparent 30%
+    ),
+    var(--cream);
+}
+
+.guide-hero-inner {
+  width: min(100%, var(--max-width));
+
+  margin: auto;
+}
+
+.guide-hero h1 {
+  max-width: 900px;
+
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 6.4vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+
+  color: var(--ink);
+}
+
+.guide-hero h1 em {
+  display: block;
+
+  color: var(--green);
+}
+
+.guide-hero-lead {
+  max-width: 620px;
+
+  margin-top: 30px;
+
+  font-size: 1.08rem;
+  line-height: 1.7;
+
+  color: var(--ink-soft);
+}
+
+.guide-hero-actions {
+  margin-top: 40px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 14px;
+}
+
+
+/* =========================================================
+   LAYOUT E ÍNDICE
+========================================================= */
+
+.guide-layout {
+  width: min(90%, var(--max-width));
+
+  margin: auto;
+  padding: 90px 0 110px;
+
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+
+  gap: 70px;
+  align-items: start;
+}
+
+.guide-toc {
+  position: sticky;
+  top: 130px;
+}
+
+.guide-toc-title {
+  margin-bottom: 18px;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+
+  color: var(--terracotta);
+}
+
+.guide-toc ol {
+  list-style: none;
+
+  border-left: 1px solid var(--border);
+}
+
+.guide-toc a {
+  display: flex;
+
+  gap: 12px;
+
+  padding: 10px 0 10px 18px;
+  margin-left: -1px;
+
+  border-left: 2px solid transparent;
+
+  font-size: 0.9rem;
+  line-height: 1.35;
+
+  color: var(--ink-soft);
+
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.guide-toc a span {
+  font-weight: 700;
+
+  color: var(--ochre);
+}
+
+.guide-toc a:hover,
+.guide-toc a.active {
+  border-left-color: var(--green);
+
+  color: var(--ink);
+}
+
+
+/* =========================================================
+   SECCIONES
+========================================================= */
+
+.guide-content {
+  max-width: 820px;
+}
+
+.guide-section {
+  padding-bottom: 70px;
+  margin-bottom: 70px;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.guide-section-heading {
+  margin-bottom: 28px;
+
+  display: flex;
+  align-items: baseline;
+
+  gap: 20px;
+}
+
+.guide-number {
+  flex-shrink: 0;
+
+  font-family: var(--serif);
+  font-size: 1.1rem;
+
+  color: var(--ochre);
+}
+
+.guide-section h2 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+
+  color: var(--ink);
+}
+
+.guide-section p {
+  margin-bottom: 18px;
+
+  font-size: 1.02rem;
+  line-height: 1.75;
+
+  color: var(--ink-soft);
+}
+
+.guide-section p:last-child {
+  margin-bottom: 0;
+}
+
+.guide-section strong {
+  color: var(--ink);
+}
+
+.guide-section a:not(.button) {
+  font-weight: 600;
+
+  color: var(--green-dark);
+
+  text-decoration: underline;
+  text-decoration-color: var(--ochre);
+  text-underline-offset: 3px;
+}
+
+.guide-lead {
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2.2vw, 1.6rem) !important;
+  line-height: 1.45 !important;
+
+  color: var(--ink) !important;
+}
+
+.guide-kicker {
+  display: inline-block;
+
+  padding: 6px 14px;
+
+  border-radius: 999px;
+
+  font-size: 0.8rem !important;
+  font-weight: 700;
+
+  color: var(--green-dark) !important;
+
+  background: var(--green-light);
+}
+
+.guide-subheading {
+  margin: 44px 0 18px;
+
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   ROLES
+========================================================= */
+
+.role-grid {
+  margin-top: 26px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.role-card {
+  padding: 30px;
+
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--green);
+  border-radius: 18px;
+
+  background: var(--paper);
+}
+
+.role-fijo {
+  border-top-color: var(--terracotta);
+}
+
+.role-tag {
+  display: inline-block;
+
+  margin-bottom: 14px !important;
+  padding: 5px 12px;
+
+  border-radius: 999px;
+
+  font-size: 0.72rem !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  color: var(--green-dark) !important;
+
+  background: var(--green-light);
+}
+
+.role-fijo .role-tag {
+  color: #8c4c36 !important;
+
+  background: var(--terracotta-light);
+}
+
+.role-card h3 {
+  margin-bottom: 12px;
+
+  font-family: var(--serif);
+  font-size: 1.7rem;
+
+  color: var(--ink);
+}
+
+.role-card p {
+  font-size: 0.96rem;
+}
+
+.role-note {
+  margin-top: 16px;
+  padding-top: 16px;
+
+  border-top: 1px dashed var(--border);
+
+  font-size: 0.9rem !important;
+  font-style: italic;
+}
+
+
+/* =========================================================
+   REQUISITOS
+========================================================= */
+
+.requirement-grid {
+  margin-top: 28px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+  counter-reset: requirement;
+}
+
+.requirement {
+  position: relative;
+
+  padding: 26px 26px 26px 72px;
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  background: var(--paper);
+
+  counter-increment: requirement;
+}
+
+.requirement::before {
+  content: counter(requirement);
+
+  position: absolute;
+  top: 24px;
+  left: 24px;
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: var(--green-dark);
+
+  background: var(--ochre-light);
+}
+
+.requirement h3 {
+  margin-bottom: 8px;
+
+  font-size: 1.05rem;
+
+  color: var(--ink);
+}
+
+.requirement p {
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   CREACIÓN DE CONTENIDO
+========================================================= */
+
+.guide-callout {
+  padding: 30px 32px;
+
+  border-left: 4px solid var(--ochre);
+  border-radius: 0 18px 18px 0;
+
+  background: var(--ochre-light);
+}
+
+.guide-callout h3 {
+  margin-bottom: 10px;
+
+  font-family: var(--serif);
+  font-size: 1.45rem;
+
+  color: var(--ink);
+}
+
+.guide-callout p {
+  color: var(--ink) !important;
+}
+
+.check-list,
+.warning-list {
+  list-style: none;
+
+  display: grid;
+
+  gap: 12px;
+}
+
+.check-list li,
+.warning-list li {
+  position: relative;
+
+  padding: 16px 20px 16px 54px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  line-height: 1.6;
+
+  color: var(--ink-soft);
+
+  background: var(--paper);
+}
+
+.check-list li::before,
+.warning-list li::before {
+  position: absolute;
+  top: 15px;
+  left: 18px;
+
+  width: 24px;
+  height: 24px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.check-list li::before {
+  content: "✓";
+
+  color: #fff;
+
+  background: var(--green);
+}
+
+.step-list {
+  list-style: none;
+
+  counter-reset: step;
+}
+
+.step-list li {
+  position: relative;
+
+  padding: 0 0 22px 54px;
+
+  line-height: 1.65;
+
+  color: var(--ink-soft);
+
+  counter-increment: step;
+}
+
+.step-list li::before {
+  content: counter(step);
+
+  position: absolute;
+  top: -2px;
+  left: 0;
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--green);
+  border-radius: 50%;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: var(--green);
+}
+
+.step-list li:not(:last-child)::after {
+  content: "";
+
+  position: absolute;
+  top: 34px;
+  bottom: 4px;
+  left: 16px;
+
+  width: 1px;
+
+  background: var(--border);
+}
+
+
+/* =========================================================
+   SITUACIONES
+========================================================= */
+
+.warning-list {
+  margin: 24px 0 28px;
+}
+
+.warning-list li {
+  border-color: rgba(183, 101, 73, 0.25);
+}
+
+.warning-list li::before {
+  content: "!";
+
+  color: #fff;
+
+  background: var(--terracotta);
+}
+
+.guide-note {
+  padding: 20px 24px;
+
+  border-radius: 14px;
+
+  font-size: 0.95rem !important;
+
+  color: var(--ink) !important;
+
+  background: var(--blue-light);
+}
+
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.guide-cta {
+  padding: 56px 48px;
+
+  border-radius: 26px;
+
+  color: #fff;
+
+  background: var(--green-dark);
+}
+
+.guide-cta .section-label {
+  color: var(--ochre);
+}
+
+.guide-cta h2 {
+  margin-bottom: 30px;
+
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.guide-cta h2 em {
+  color: var(--ochre-light);
+}
+
+.guide-meta {
+  margin-top: 28px;
+
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+
+  color: var(--ink-soft);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1150px) {
+  .guide-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+
+    gap: 50px;
+  }
+
+  .requirement-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 950px) {
+  .guide-hero {
+    padding: 150px 6% 80px;
+  }
+
+  .guide-layout {
+    width: min(88%, var(--max-width));
+
+    padding-top: 50px;
+
+    grid-template-columns: 1fr;
+
+    gap: 40px;
+  }
+
+  .guide-toc {
+    position: static;
+
+    padding: 24px;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    background: var(--paper);
+  }
+
+  .guide-toc ol {
+    border-left: 0;
+  }
+
+  .guide-toc a {
+    padding: 8px 0;
+    margin-left: 0;
+
+    border-left: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .guide-hero {
+    padding: 130px 6% 64px;
+  }
+
+  .guide-hero-actions .button {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+  .role-grid,
+  .requirement-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-section {
+    padding-bottom: 50px;
+    margin-bottom: 50px;
+  }
+
+  .guide-section-heading {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .role-card,
+  .guide-callout {
+    padding: 24px;
+  }
+
+  .requirement {
+    padding: 72px 22px 22px;
+  }
+
+  .requirement::before {
+    top: 24px;
+    left: 22px;
+  }
+
+  .guide-cta {
+    padding: 40px 26px;
+  }
+}
+
+
+/* =========================================================
+   IMPRESIÓN
+========================================================= */
+
+@media print {
+  .header,
+  .footer,
+  .skip-link,
+  .guide-toc,
+  .guide-hero-actions,
+  .guide-cta {
+    display: none !important;
+  }
+
+  .guide-hero {
+    padding: 0 0 30px;
+
+    background: none;
+  }
+
+  .guide-layout {
+    display: block;
+
+    padding: 0;
+  }
+
+  .guide-section {
+    break-inside: avoid-page;
+  }
+}

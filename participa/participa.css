@@ -1529,3 +1529,33 @@ img {
   }
 
 }
+
+
+/* =========================================================
+   LINEAMIENTOS
+========================================================= */
+
+.guidelines-link {
+  display: inline-block;
+
+  font-weight: 700;
+
+  color: var(--green-dark);
+
+  text-decoration: underline;
+  text-decoration-color: var(--ochre);
+  text-underline-offset: 4px;
+}
+
+.review-notice p + p {
+  margin-top: 10px;
+}
+
+.review-notice a {
+  font-weight: 700;
+
+  color: var(--green-dark);
+
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
