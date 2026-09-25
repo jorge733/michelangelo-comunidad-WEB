@@ -20,11 +20,11 @@
   <script type="module">
     const config={apiKey:"AIzaSyDWSpVS8It00pQXE7I541w-ywTu6mvphIM",authDomain:"michelangelo-comunidad.firebaseapp.com",projectId:"michelangelo-comunidad"};
     const list=document.querySelector('#list');
-    const [{initializeApp},{getFirestore,collection,onSnapshot}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js')]);
+    const [{initializeApp},{getFirestore,collection,query,where,onSnapshot}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js')]);
     const db=getFirestore(initializeApp(config));
     const state=(message,error=false)=>{list.replaceChildren();const node=document.createElement('p');node.className=`public-state${error?' error':''}`;node.textContent=message;list.append(node)};
-    onSnapshot(collection(db,'publicaciones'),snapshot=>{
-      const items=snapshot.docs.map(doc=>doc.data()).filter(item=>item.seccion==='vida'&&item.videoUrl);list.replaceChildren();
+    onSnapshot(query(collection(db,'publicaciones'),where('seccion','==','vida')),snapshot=>{
+      const items=snapshot.docs.map(doc=>doc.data()).filter(item=>item.videoUrl);list.replaceChildren();
       if(!items.length){state('Aún no hay videos publicados. Vuelve pronto para acompañar la vida de Michelangelo.');return}
       items.sort((a,b)=>(b.publicadoEn?.seconds||0)-(a.publicadoEn?.seconds||0));
       for(const item of items){const card=document.createElement('article');card.className='video-card';const video=document.createElement('video');video.src=item.videoUrl;video.controls=true;video.preload='metadata';const copy=document.createElement('div');copy.className='video-copy';const title=document.createElement('h2');title.textContent=item.titulo||'Sin título';const description=document.createElement('p');description.textContent=item.descripcion||'';const author=document.createElement('small');author.textContent=item.autor||'Michelangelo Comunidad';copy.append(title,description,author);card.append(video,copy);list.append(card)}

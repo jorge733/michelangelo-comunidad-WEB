@@ -2,6 +2,20 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Un editor de Studio es una cuenta con correo y contraseña cuyo UID existe
+    // en /editores. Las sesiones anónimas del formulario público nunca cuentan.
+    function isEditor() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'password'
+        && exists(/databases/$(database)/documents/editores/$(request.auth.uid));
+    }
+
+    // Lista de editores: solo se administra desde la consola de Firebase.
+    match /editores/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     // Bandeja privada: el público solo puede crear aportes; Studio autenticado
     // puede revisarlos y cambiar su estado, sin borrarlos desde el cliente.
     match /aportes/{aporteId} {
@@ -12,18 +26,23 @@ service cloud.firestore {
         && request.resource.data.tipo in ['periodico', 'creacion', 'podcast', 'idea']
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() <= 120
         && request.resource.data.curso is string
+        && request.resource.data.curso.size() <= 60
         && request.resource.data.titulo is string
+        && request.resource.data.titulo.size() <= 200
         && request.resource.data.descripcion is string
+        && request.resource.data.descripcion.size() <= 5000
         && request.resource.data.detalles is map
+        && request.resource.data.detalles.size() <= 10
         && request.resource.data.anonimoPublicamente is bool
         && request.resource.data.quiereParticipar is bool
-        && request.resource.data.creadoEn is timestamp;
+        && request.resource.data.creadoEn == request.time;
 
-      allow read: if request.auth != null;
+      allow read: if isEditor();
       // Studio solo puede cambiar el estado editorial; el aporte conserva
       // siempre su información original y su preferencia de anonimato.
-      allow update: if request.auth != null
+      allow update: if isEditor()
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['estado'])
         && request.resource.data.estado in ['pendiente', 'revision', 'aprobado', 'rechazado'];
@@ -34,7 +53,7 @@ service cloud.firestore {
     // publicaciones ya aprobadas, puede leerse desde las páginas públicas.
     match /publicaciones/{publicacionId} {
       allow read: if true;
-      allow create: if request.auth != null
+      allow create: if isEditor()
         && request.resource.data.keys().hasOnly([
           'seccion', 'aporteId', 'titulo', 'descripcion', 'autor', 'archivo',
           'imagenUrl', 'videoUrl', 'publicadoEn'
@@ -44,7 +63,7 @@ service cloud.firestore {
         && request.resource.data.descripcion is string
         && request.resource.data.autor is string
         && request.resource.data.publicadoEn is timestamp;
-      allow update: if request.auth != null;
+      allow update: if isEditor();
       allow delete: if false;
     }
 

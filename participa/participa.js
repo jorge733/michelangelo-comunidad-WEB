@@ -320,6 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
               type="text"
 
               id="proposalTitle"
+              maxlength="200"
 
               name="proposalTitle"
 
@@ -450,6 +451,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <textarea
 
               id="proposalDescription"
+              maxlength="5000"
 
               name="proposalDescription"
 
@@ -534,6 +536,7 @@ document.addEventListener("DOMContentLoaded", () => {
               type="text"
 
               id="proposalTitle"
+              maxlength="200"
 
               name="proposalTitle"
 
@@ -626,6 +629,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <textarea
 
               id="proposalDescription"
+              maxlength="5000"
 
               name="proposalDescription"
 
@@ -752,6 +756,7 @@ document.addEventListener("DOMContentLoaded", () => {
               type="text"
 
               id="proposalTitle"
+              maxlength="200"
 
               name="proposalTitle"
 
@@ -786,6 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <textarea
 
               id="proposalDescription"
+              maxlength="5000"
 
               name="proposalDescription"
 
@@ -904,6 +910,7 @@ document.addEventListener("DOMContentLoaded", () => {
               type="text"
 
               id="proposalTitle"
+              maxlength="200"
 
               name="proposalTitle"
 
@@ -936,6 +943,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <textarea
 
               id="proposalDescription"
+              maxlength="5000"
 
               name="proposalDescription"
 
@@ -968,6 +976,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <textarea
 
               id="ideaReason"
+              maxlength="5000"
 
               name="ideaReason"
 

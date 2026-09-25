@@ -2,6 +2,14 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    // Mismo criterio que firestore.rules: cuenta con correo y contraseña
+    // registrada en /editores. Las sesiones anónimas nunca son editores.
+    function isEditor() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'password'
+        && firestore.exists(/databases/(default)/documents/editores/$(request.auth.uid));
+    }
+
     // Las fotos de aportes públicos nunca se leen desde el sitio público.
     // Studio autenticado las revisa antes de cualquier publicación editorial.
     match /aportes/{aporteId}/fotografias/{fileName} {
@@ -11,16 +19,16 @@ service firebase.storage {
       allow create: if request.auth != null
         && request.resource.size <= 10 * 1024 * 1024
         && request.resource.contentType.matches('image/(jpeg|png|webp)');
-      allow read: if request.auth != null;
+      allow read: if isEditor();
       allow delete: if false;
     }
 
     // Los videos solo podrán subirse y revisarse desde Studio autenticado.
     match /publicaciones/{publicacionId}/videos/{fileName} {
-      allow create, update: if request.auth != null
+      allow create, update: if isEditor()
         && request.resource.size <= 250 * 1024 * 1024
         && request.resource.contentType.matches('video/(mp4|webm)');
-      allow read: if request.auth != null;
+      allow read: if isEditor();
       allow delete: if false;
     }
 
