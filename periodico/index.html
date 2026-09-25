@@ -1,31 +1,199 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Lector del Periódico Escolar de Michelangelo Comunidad.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Periódico Escolar | Michelangelo Comunidad</title>
-  <link rel="icon" href="../assets/logo-michelangelo.jpg">
+  <meta
+    name="description"
+    content="Lee el Periódico Escolar de Michelangelo: noticias, entrevistas, historias y voces de nuestra comunidad."
+  >
+  <link rel="icon" type="image/jpeg" href="../assets/logo-michelangelo.jpg">
   <link rel="stylesheet" href="../css/styles.css">
-  <style>
-    .reader-page{min-height:100vh;background:#f4eee3}.periodico-frame{height:calc(100vh - 101px);min-height:670px;overflow:hidden}.embedded-reader{width:100%;height:calc(100% + 89px);margin-top:-89px;display:block;border:0;background:#fff}@media(max-width:720px){.periodico-frame{height:calc(100vh - 86px);min-height:610px}.embedded-reader{height:calc(100% + 78px);margin-top:-78px}}
-  </style>
+  <link rel="stylesheet" href="periodico.css">
 </head>
-<body class="reader-page">
+<body>
+
   <a class="skip-link" href="#lector">Saltar al lector del periódico</a>
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
   <header class="header">
     <div class="header-container">
       <a href="../" class="brand" aria-label="Michelangelo Comunidad">
         <img src="../assets/logo-michelangelo.jpg" alt="Michelangelo Colegio Waldorf" class="brand-logo">
-        <div class="brand-community"><span>COMUNIDAD</span><small>Un espacio de estudiantes</small></div>
+        <div class="brand-community">
+          <span>COMUNIDAD</span>
+          <small>Un espacio de estudiantes</small>
+        </div>
       </a>
-      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación" aria-controls="mainNav" aria-expanded="false"><span></span><span></span><span></span></button>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Abrir menú de navegación"
+        aria-controls="mainNav"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       <nav class="nav" id="mainNav">
-        <a href="../">Inicio</a><a href="./" class="active">Periódico</a><a href="../podcast/">Podcast</a><a href="../creaciones/">Creaciones</a><a href="../vida/">Vida Michelangelo</a><a href="../participa/" class="nav-highlight">Participa</a>
+        <a href="../">Inicio</a>
+        <a href="./" class="active">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <a href="../vida/">Vida Michelangelo</a>
+        <a href="../participa/" class="nav-highlight">Participa</a>
       </nav>
     </div>
   </header>
-  <main class="periodico-frame" id="lector"><iframe class="embedded-reader" src="https://periodicoescolarmichelangelo.vercel.app/" title="Lector del Periódico Escolar Michelangelo" allow="fullscreen" referrerpolicy="strict-origin-when-cross-origin">Tu navegador no permite mostrar el lector integrado.</iframe></main>
+
+  <main>
+
+    <!-- =====================================================
+         INTRODUCCIÓN
+    ====================================================== -->
+
+    <section class="paper-intro">
+      <div class="paper-intro-inner">
+
+        <div class="paper-intro-copy">
+          <p class="eyebrow">PERIÓDICO ESCOLAR</p>
+
+          <h1>
+            Lo que pasa en Michelangelo,
+            <em>contado por nosotros.</em>
+          </h1>
+
+          <p class="paper-intro-lead">
+            Noticias, entrevistas, historias, arte y opiniones de estudiantes.
+            Un periódico hecho por la comunidad, para la comunidad.
+          </p>
+
+          <div class="edition-meta" aria-live="polite">
+            <span class="edition-badge">Última edición</span>
+            <strong id="editionTitle">Edición</strong>
+            <span id="editionDetails"></span>
+          </div>
+
+          <div class="paper-intro-actions">
+            <a href="#lector" class="button button-primary">Leer edición</a>
+            <a href="#" class="button button-secondary" id="introPdf" target="_blank" rel="noopener">
+              Descargar PDF
+            </a>
+          </div>
+        </div>
+
+        <a href="#lector" class="paper-cover" aria-label="Abrir la edición en el lector">
+          <img id="coverImage" src="" alt="" width="1020" height="1320">
+        </a>
+
+      </div>
+    </section>
+
+    <!-- =====================================================
+         LECTOR
+    ====================================================== -->
+
+    <section class="reader" id="lector" aria-label="Lector del periódico">
+      <div class="reader-shell" id="readerShell">
+
+        <div class="reader-toolbar">
+          <div class="reader-title">
+            <p class="section-label">LEER EDICIÓN</p>
+            <h2 id="readerTitle">Edición</h2>
+          </div>
+
+          <div class="reader-tools">
+            <label class="edition-select" id="editionSelectWrap" hidden>
+              <span class="visually-hidden">Elegir edición</span>
+              <select id="editionSelect"></select>
+            </label>
+
+            <a href="#" class="reader-tool" id="readerPdf" target="_blank" rel="noopener">
+              Descargar PDF
+            </a>
+
+            <button type="button" class="reader-tool" id="fullscreenBtn">
+              Pantalla completa
+            </button>
+          </div>
+        </div>
+
+        <div class="book-stage" id="bookStage">
+          <div class="book-loading" id="bookLoading">Cargando edición…</div>
+        </div>
+
+        <div class="reader-controls">
+          <button type="button" class="page-button" id="prevBtn" aria-label="Página anterior">
+            ← <span>Anterior</span>
+          </button>
+
+          <div class="page-status">
+            <span id="pageLabel">Página 1</span>
+            <div class="page-progress" aria-hidden="true">
+              <div id="pageBar"></div>
+            </div>
+          </div>
+
+          <button type="button" class="page-button" id="nextBtn" aria-label="Página siguiente">
+            <span>Siguiente</span> →
+          </button>
+        </div>
+
+        <p class="reader-hint">
+          Usa los botones, las flechas ← → del teclado o arrastra una esquina de la página.
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <strong>MICHELANGELO</strong>
+        <span>COMUNIDAD</span>
+      </div>
+
+      <p>
+        Un espacio de participación y creación
+        de estudiantes de Michelangelo.
+      </p>
+
+      <div class="footer-links">
+        <a href="../">Inicio</a>
+        <a href="./">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <a href="../vida/">Vida Michelangelo</a>
+        <a href="../participa/">Participa</a>
+        <a href="../lineamientos/">Lineamientos</a>
+        <a href="https://michelangelo.cl/" target="_blank" rel="noopener noreferrer">
+          Sitio oficial Michelangelo
+        </a>
+      </div>
+
+      <div class="footer-bottom">
+        <span>Michelangelo Comunidad</span>
+        <span id="currentYear"></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+  <script src="ediciones.js"></script>
+  <script src="periodico.js"></script>
   <script src="../js/app.js"></script>
 </body>
 </html>
