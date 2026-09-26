@@ -418,8 +418,19 @@ html {
    los gestos horizontales los interpreta periodico.js.
 ========================================================= */
 
+.reader {
+  overflow-anchor: none;
+}
+
 @media (pointer: coarse) {
+  .reader-controls button,
+  .reader-tool {
+    touch-action: manipulation;
+  }
+
   .book-frame {
+    overflow: clip;
+
     touch-action: pan-y pinch-zoom;
 
     -webkit-user-select: none;

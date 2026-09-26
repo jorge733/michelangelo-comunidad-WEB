@@ -141,6 +141,30 @@
     target.addEventListener("touchcancel", () => (start = null), { passive: true });
   }
 
+  // Algunos navegadores móviles desplazan la página mientras se dibuja el giro.
+  // Si el sitio se movió sin que la persona estuviera tocando la pantalla,
+  // al terminar el giro se vuelve a la posición en que estaba.
+  let isTouching = false;
+  let scrollBeforeFlip = null;
+
+  document.addEventListener("touchstart", () => (isTouching = true), { passive: true, capture: true });
+  ["touchend", "touchcancel"].forEach((type) =>
+    document.addEventListener(type, () => (isTouching = false), { passive: true, capture: true })
+  );
+
+  function rememberScroll() {
+    scrollBeforeFlip = window.scrollY;
+  }
+
+  function restoreScroll() {
+    if (scrollBeforeFlip === null) return;
+    const target = scrollBeforeFlip;
+    scrollBeforeFlip = null;
+    if (!isTouching && Math.abs(window.scrollY - target) > 40) {
+      window.scrollTo({ top: target, behavior: "instant" });
+    }
+  }
+
   function createFlipReader(edicion, frame) {
     const book = document.createElement("div");
     book.className = "book";
@@ -182,7 +206,11 @@
     flip.on("flip", (event) => report(event.data));
     flip.on("changeOrientation", () => report(flip.getCurrentPageIndex()));
     flip.on("changeState", (event) => {
-      if (event.data === "flipping") playPageSound();
+      if (event.data === "flipping") {
+        playPageSound();
+        rememberScroll();
+      }
+      if (event.data === "read") restoreScroll();
     });
     report(0);
 
