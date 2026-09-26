@@ -1454,3 +1454,141 @@ img {
 .participate-guidelines:hover {
   color: #fff;
 }
+
+
+/* =========================================================
+   CELULARES — PORTADA MÁS COMPACTA
+========================================================= */
+
+@media (max-width: 600px) {
+  .hero {
+    min-height: 88svh;
+    padding-bottom: 70px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.7rem, 12.5vw, 4.4rem);
+  }
+
+  .intro,
+  .feature-section {
+    padding: 72px 0;
+  }
+
+  .section-heading {
+    margin-bottom: 36px;
+  }
+
+  .project-card {
+    min-height: 0;
+    padding: 24px 22px 26px;
+
+    gap: 18px;
+  }
+
+  .project-number {
+    top: 24px;
+    right: 24px;
+  }
+
+  .project-icon {
+    font-size: 2rem;
+  }
+
+  .project-content h3 {
+    margin-bottom: 12px;
+
+    font-size: 2rem;
+  }
+
+  .project-content h3 br {
+    display: none;
+  }
+
+  .project-content > p {
+    margin-bottom: 18px;
+  }
+
+  .creation-categories {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .creation-category {
+    min-height: 0;
+    padding: 22px 18px 24px;
+
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .creation-category:nth-child(odd) {
+    border-right: 1px solid var(--border);
+  }
+
+  .creation-category:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .creation-symbol {
+    margin: 18px 0 10px;
+
+    font-size: 2rem;
+  }
+
+  .creation-category h3 {
+    margin-bottom: 8px;
+
+    font-size: 1.35rem;
+  }
+
+  .creation-category p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .podcast-visual,
+  .life-visual {
+    min-height: 280px;
+  }
+
+  .microphone {
+    margin-bottom: 24px;
+
+    font-size: 3.6rem;
+  }
+
+  .podcast-visual p {
+    font-size: 0.72rem;
+  }
+
+  .life-word {
+    font-size: 4.4rem;
+  }
+
+  .participate {
+    padding: 80px 6%;
+  }
+
+  .participate-options {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .participate-options a {
+    min-height: 112px;
+    padding: 18px 10px;
+
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  .participate-options a:nth-child(odd) {
+    border-right: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .participate-options a:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+}

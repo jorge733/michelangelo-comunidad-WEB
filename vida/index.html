@@ -1,22 +1,113 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Vida Michelangelo: videos y momentos publicados por la comunidad.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vida Michelangelo | Michelangelo Comunidad</title>
-  <link rel="icon" href="../assets/logo-michelangelo.jpg">
+  <meta name="description" content="Vida Michelangelo: videos y momentos publicados por la comunidad.">
+  <link rel="icon" type="image/jpeg" href="../assets/logo-michelangelo.jpg">
   <link rel="stylesheet" href="../css/styles.css">
-  <style>
-    .public-page{max-width:1120px;margin:auto;padding:48px 5% 90px}.public-back{display:inline-block;margin-bottom:42px;font-weight:700}.public-hero{max-width:810px;margin-bottom:52px}.public-hero h1{font-family:var(--serif,Georgia,serif);font-size:clamp(3.2rem,8vw,6.5rem);line-height:.95;letter-spacing:-.05em}.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px}.video-card{border:1px solid var(--border,#ded8cf);background:var(--paper,#fffdf8)}.video-card video{width:100%;display:block;background:#202522;aspect-ratio:16/9}.video-copy{padding:20px}.video-card h2{font-family:var(--serif,Georgia,serif);font-size:1.7rem;line-height:1.05}.video-card p{margin:10px 0 16px;color:var(--ink-soft,#596057);line-height:1.55}.video-card small{color:var(--terracotta,#b76549);font-weight:700}.public-state{padding:32px;border:1px solid var(--border,#ded8cf);background:var(--paper,#fffdf8);line-height:1.6}.public-state.error{border-color:#b76549;color:#8c4c36}
-  </style>
+  <link rel="stylesheet" href="../css/publicaciones.css">
+  <meta name="theme-color" content="#faf7f0">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Michelangelo Comunidad">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:title" content="Vida Michelangelo | Michelangelo Comunidad">
+  <meta property="og:description" content="Vida Michelangelo: videos y momentos publicados por la comunidad.">
+  <meta property="og:url" content="https://comunidadmichelangelo.vercel.app/vida/">
+  <meta property="og:image" content="https://comunidadmichelangelo.vercel.app/assets/logo-michelangelo.jpg">
+  <meta name="twitter:card" content="summary">
+  <link rel="apple-touch-icon" href="../assets/logo-michelangelo.jpg">
+  <link rel="stylesheet" href="../css/comun.css">
 </head>
 <body>
-  <main class="public-page">
-    <a class="public-back" href="../">← Comunidad</a>
-    <header class="public-hero"><p class="eyebrow">VIDA MICHELANGELO</p><h1>Las cosas que pasan también hacen historia.</h1></header>
-    <section id="list" class="video-grid" aria-live="polite"><p class="public-state">Cargando publicaciones…</p></section>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="header">
+    <div class="header-container">
+      <a href="../" class="brand" aria-label="Michelangelo Comunidad">
+        <img src="../assets/logo-michelangelo.jpg" alt="Michelangelo Colegio Waldorf" class="brand-logo">
+        <div class="brand-community">
+          <span>COMUNIDAD</span>
+          <small>Un espacio de estudiantes</small>
+        </div>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Abrir menú de navegación"
+        aria-controls="mainNav"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav" aria-label="Navegación principal">
+        <a href="../">Inicio</a>
+        <a href="../periodico/">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <a href="../vida/" class="active" aria-current="page">Vida Michelangelo</a>
+        <a href="../lineamientos/">Lineamientos</a>
+        <a href="../participa/" class="nav-highlight">Participa</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+    <section class="public-hero">
+      <div class="public-hero-inner">
+        <p class="eyebrow">VIDA MICHELANGELO</p>
+        <h1>Las cosas que pasan <em>también hacen historia.</em></h1>
+        <p class="public-hero-lead">Actividades, celebraciones, proyectos y pequeños momentos que construyen nuestra experiencia en Michelangelo.</p>
+        <a href="../participa/" class="button button-primary">Proponer un momento</a>
+      </div>
+    </section>
+
+    <section class="public-list" aria-label="Publicaciones">
+      <div id="list" class="public-grid video-grid" aria-live="polite">
+        <p class="public-state">Cargando publicaciones…</p>
+      </div>
+    </section>
+
   </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <strong>MICHELANGELO</strong>
+        <span>COMUNIDAD</span>
+      </div>
+
+      <p>
+        Un espacio de participación y creación
+        de estudiantes de Michelangelo.
+      </p>
+
+      <div class="footer-links">
+        <a href="../">Inicio</a>
+        <a href="../periodico/">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <a href="../vida/">Vida Michelangelo</a>
+        <a href="../participa/">Participa</a>
+        <a href="../lineamientos/">Lineamientos</a>
+        <a href="https://michelangelo.cl/" target="_blank" rel="noopener noreferrer">Sitio oficial Michelangelo</a>
+      </div>
+
+      <div class="footer-bottom">
+        <span>Michelangelo Comunidad</span>
+        <span id="currentYear"></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/app.js"></script>
   <script type="module">
     const config={apiKey:"AIzaSyDWSpVS8It00pQXE7I541w-ywTu6mvphIM",authDomain:"michelangelo-comunidad.firebaseapp.com",projectId:"michelangelo-comunidad"};
     const list=document.querySelector('#list');

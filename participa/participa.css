@@ -1559,3 +1559,50 @@ img {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+
+/* =========================================================
+   CELULARES — AJUSTES
+========================================================= */
+
+@media (max-width: 650px) {
+  .hero {
+    min-height: 0;
+    padding: 130px 6% 72px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.7rem, 12.5vw, 4.4rem);
+  }
+
+  .intro-section {
+    padding: 64px 0 40px;
+  }
+
+  .category-card {
+    min-height: 0;
+    padding: 24px 22px 28px;
+  }
+
+  .category-icon {
+    margin: 18px 0 12px;
+
+    font-size: 2.4rem;
+  }
+
+  .category-card h3 {
+    font-size: 1.8rem;
+  }
+
+  .form-section {
+    padding: 64px 4%;
+  }
+
+  .closing-section {
+    padding: 72px 0;
+  }
+
+  .checkbox-row {
+    min-height: 44px;
+  }
+}

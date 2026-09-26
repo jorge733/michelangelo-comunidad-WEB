@@ -1,0 +1,277 @@
+/* =========================================================
+   MICHELANGELO COMUNIDAD
+   comun.css — Capa compartida por todas las páginas públicas.
+   Se carga al final para unificar encabezado, menú móvil,
+   pie de página y ajustes de lectura en celulares.
+========================================================= */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  -webkit-tap-highlight-color: rgba(82, 107, 88, 0.18);
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   NAVEGACIÓN
+========================================================= */
+
+.nav a.active:not(.nav-highlight) {
+  color: var(--terracotta);
+}
+
+@media (max-width: 1240px) and (min-width: 951px) {
+  .nav {
+    gap: 16px;
+
+    font-size: 0.76rem;
+  }
+
+  .brand-community small {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   MENÚ MÓVIL
+========================================================= */
+
+@media (max-width: 950px) {
+  .header {
+    --header-height: 86px;
+  }
+
+  .menu-toggle {
+    position: relative;
+
+    width: 48px;
+    height: 48px;
+
+    margin-right: -6px;
+
+    border-radius: 50%;
+  }
+
+  .menu-toggle span {
+    transition: transform 0.3s ease, opacity 0.2s ease;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* El desenfoque del encabezado lo vuelve el bloque contenedor del menú,
+     así que el alto se calcula con la pantalla y no con bottom: 0. */
+  .nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+
+    width: auto;
+    height: calc(100vh - var(--header-height));
+    height: calc(100dvh - var(--header-height));
+
+    padding: 12px 6% calc(32px + env(safe-area-inset-bottom));
+
+    align-items: stretch;
+
+    gap: 0;
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    font-size: 1rem;
+
+    background: var(--cream-light);
+
+    border-bottom: 0;
+  }
+
+  .nav.active {
+    display: flex;
+
+    animation: menu-in 0.25s ease;
+  }
+
+  .nav a {
+    min-height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid var(--border);
+
+    font-family: var(--serif);
+    font-size: 1.55rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+
+    color: var(--ink);
+  }
+
+  .nav a:not(.nav-highlight)::after {
+    content: "→";
+
+    position: static;
+
+    width: auto;
+    height: auto;
+
+    font-family: var(--sans);
+    font-size: 1rem;
+
+    color: var(--ochre);
+
+    background: none;
+
+    transform: none;
+  }
+
+  .nav a.active:not(.nav-highlight)::after {
+    content: "●";
+
+    font-size: 0.6rem;
+
+    color: var(--terracotta);
+  }
+
+  .nav .nav-highlight {
+    min-height: 56px;
+
+    margin-top: 26px;
+
+    justify-content: center;
+
+    border-bottom: 0;
+
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0;
+
+    color: #fff;
+  }
+
+  /* Evita que la página se desplace detrás del menú abierto. */
+  body:has(.nav.active) {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 650px) {
+  .header {
+    --header-height: 76px;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 650px) {
+
+  /* Textos pequeños legibles */
+  .eyebrow,
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+  }
+
+  .brand-community span {
+    font-size: 0.66rem;
+  }
+
+  /* Pie de página con áreas táctiles cómodas */
+  .footer {
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 0 18px;
+  }
+
+  .footer-links a {
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    font-size: 0.9rem;
+  }
+
+  .footer-bottom {
+    font-size: 0.75rem;
+  }
+
+  /* Botones cómodos para el pulgar */
+  .button,
+  .hero-button,
+  .text-link {
+    min-height: 48px;
+  }
+
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+
+/* =========================================================
+   MOVIMIENTO REDUCIDO
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

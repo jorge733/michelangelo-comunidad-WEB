@@ -1,0 +1,206 @@
+/* =========================================================
+   MICHELANGELO COMUNIDAD
+   publicaciones.css — Creaciones y Vida Michelangelo
+========================================================= */
+
+.public-hero {
+  padding: 170px 5% 80px;
+
+  background:
+    radial-gradient(
+      circle at 88% 25%,
+      rgba(196, 154, 80, 0.18),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(183, 101, 73, 0.12),
+      transparent 30%
+    ),
+    var(--cream);
+}
+
+.public-hero-inner {
+  width: min(100%, var(--max-width));
+
+  margin: auto;
+}
+
+.public-hero h1 {
+  max-width: 860px;
+
+  font-family: var(--serif);
+  font-size: clamp(2.7rem, 6.4vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+
+  color: var(--ink);
+}
+
+.public-hero h1 em {
+  display: block;
+
+  color: var(--terracotta);
+}
+
+.public-hero-lead {
+  max-width: 580px;
+
+  margin-top: 26px;
+
+  font-size: 1.05rem;
+  line-height: 1.7;
+
+  color: var(--ink-soft);
+}
+
+.public-hero .button {
+  margin-top: 32px;
+}
+
+.public-list {
+  width: min(90%, var(--max-width));
+
+  margin: auto;
+  padding: 70px 0 110px;
+}
+
+.public-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+
+  gap: 24px;
+}
+
+.video-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.publication-card,
+.video-card {
+  overflow: hidden;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: var(--paper);
+}
+
+.publication-card img {
+  width: 100%;
+
+  aspect-ratio: 1 / 1;
+
+  display: block;
+
+  object-fit: cover;
+
+  background: var(--cream);
+}
+
+.video-card video {
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  display: block;
+
+  background: #202522;
+}
+
+.publication-copy,
+.video-copy {
+  padding: 20px 22px 24px;
+}
+
+.publication-card h2,
+.video-card h2 {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  line-height: 1.1;
+
+  color: var(--ink);
+}
+
+.publication-card p,
+.video-card p {
+  margin: 10px 0 16px;
+
+  line-height: 1.6;
+
+  color: var(--ink-soft);
+}
+
+.publication-card small,
+.video-card small {
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.public-state {
+  grid-column: 1 / -1;
+
+  padding: 36px 28px;
+
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+
+  text-align: center;
+  line-height: 1.6;
+
+  color: var(--ink-soft);
+
+  background: var(--paper);
+}
+
+.public-state.error {
+  border-color: var(--terracotta);
+
+  color: #8c4c36;
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 950px) {
+  .public-hero {
+    padding: 140px 6% 64px;
+  }
+}
+
+@media (max-width: 650px) {
+  .public-hero {
+    padding: 120px 6% 52px;
+  }
+
+  .public-hero .button {
+    width: 100%;
+  }
+
+  .public-list {
+    width: 88%;
+
+    padding: 44px 0 80px;
+  }
+
+  .public-grid,
+  .video-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+}

@@ -724,3 +724,16 @@ html {
     break-inside: avoid-page;
   }
 }
+
+
+/* =========================================================
+   CELULARES — ÍNDICE TÁCTIL
+========================================================= */
+
+@media (max-width: 950px) {
+  .guide-toc a {
+    min-height: 44px;
+
+    align-items: center;
+  }
+}

@@ -1,25 +1,113 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Creaciones publicadas por Michelangelo Comunidad.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Creaciones | Michelangelo Comunidad</title>
-  <link rel="icon" href="../assets/logo-michelangelo.jpg">
+  <meta name="description" content="Arte, fotografía, literatura, música y proyectos creados por estudiantes de Michelangelo.">
+  <link rel="icon" type="image/jpeg" href="../assets/logo-michelangelo.jpg">
   <link rel="stylesheet" href="../css/styles.css">
-  <style>
-    .public-page{max-width:1120px;margin:auto;padding:48px 5% 90px}.public-back{display:inline-block;margin-bottom:42px;font-weight:700}.public-hero{max-width:760px;margin-bottom:52px}.public-hero h1{font-family:var(--serif,Georgia,serif);font-size:clamp(3.2rem,8vw,6.5rem);line-height:.95;letter-spacing:-.05em}.public-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:24px}.publication-card{overflow:hidden;border:1px solid var(--border,#ded8cf);background:var(--paper,#fffdf8)}.publication-card img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#eee}.publication-copy{padding:20px}.publication-card h2{font-family:var(--serif,Georgia,serif);font-size:1.65rem;line-height:1.05}.publication-card p{margin:10px 0 16px;color:var(--ink-soft,#596057);line-height:1.55}.publication-card small{color:var(--terracotta,#b76549);font-weight:700}.public-state{padding:32px;border:1px solid var(--border,#ded8cf);background:var(--paper,#fffdf8);line-height:1.6}.public-state.error{border-color:#b76549;color:#8c4c36}
-  </style>
+  <link rel="stylesheet" href="../css/publicaciones.css">
+  <meta name="theme-color" content="#faf7f0">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Michelangelo Comunidad">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:title" content="Creaciones | Michelangelo Comunidad">
+  <meta property="og:description" content="Arte, fotografía, literatura, música y proyectos creados por estudiantes de Michelangelo.">
+  <meta property="og:url" content="https://comunidadmichelangelo.vercel.app/creaciones/">
+  <meta property="og:image" content="https://comunidadmichelangelo.vercel.app/assets/logo-michelangelo.jpg">
+  <meta name="twitter:card" content="summary">
+  <link rel="apple-touch-icon" href="../assets/logo-michelangelo.jpg">
+  <link rel="stylesheet" href="../css/comun.css">
 </head>
 <body>
-  <main class="public-page">
-    <a class="public-back" href="../">← Comunidad</a>
-    <header class="public-hero">
-      <p class="eyebrow">CREACIONES PUBLICADAS</p>
-      <h1>Lo que imaginamos también merece un espacio.</h1>
-    </header>
-    <section id="list" class="public-grid" aria-live="polite"><p class="public-state">Cargando creaciones…</p></section>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="header">
+    <div class="header-container">
+      <a href="../" class="brand" aria-label="Michelangelo Comunidad">
+        <img src="../assets/logo-michelangelo.jpg" alt="Michelangelo Colegio Waldorf" class="brand-logo">
+        <div class="brand-community">
+          <span>COMUNIDAD</span>
+          <small>Un espacio de estudiantes</small>
+        </div>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Abrir menú de navegación"
+        aria-controls="mainNav"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav" aria-label="Navegación principal">
+        <a href="../">Inicio</a>
+        <a href="../periodico/">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/" class="active" aria-current="page">Creaciones</a>
+        <a href="../vida/">Vida Michelangelo</a>
+        <a href="../lineamientos/">Lineamientos</a>
+        <a href="../participa/" class="nav-highlight">Participa</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+    <section class="public-hero">
+      <div class="public-hero-inner">
+        <p class="eyebrow">CREACIONES</p>
+        <h1>Lo que imaginamos <em>también merece un espacio.</em></h1>
+        <p class="public-hero-lead">Arte, fotografía, literatura, música y proyectos creados por estudiantes de nuestra comunidad.</p>
+        <a href="../participa/" class="button button-primary">Compartir una creación</a>
+      </div>
+    </section>
+
+    <section class="public-list" aria-label="Publicaciones">
+      <div id="list" class="public-grid" aria-live="polite">
+        <p class="public-state">Cargando creaciones…</p>
+      </div>
+    </section>
+
   </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <strong>MICHELANGELO</strong>
+        <span>COMUNIDAD</span>
+      </div>
+
+      <p>
+        Un espacio de participación y creación
+        de estudiantes de Michelangelo.
+      </p>
+
+      <div class="footer-links">
+        <a href="../">Inicio</a>
+        <a href="../periodico/">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <a href="../vida/">Vida Michelangelo</a>
+        <a href="../participa/">Participa</a>
+        <a href="../lineamientos/">Lineamientos</a>
+        <a href="https://michelangelo.cl/" target="_blank" rel="noopener noreferrer">Sitio oficial Michelangelo</a>
+      </div>
+
+      <div class="footer-bottom">
+        <span>Michelangelo Comunidad</span>
+        <span id="currentYear"></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/app.js"></script>
   <script type="module">
     const config={apiKey:"AIzaSyDWSpVS8It00pQXE7I541w-ywTu6mvphIM",authDomain:"michelangelo-comunidad.firebaseapp.com",projectId:"michelangelo-comunidad"};
     const list=document.querySelector('#list');

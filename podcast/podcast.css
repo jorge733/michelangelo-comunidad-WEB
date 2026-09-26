@@ -1489,3 +1489,56 @@ img {
   }
 
 }
+
+
+/* =========================================================
+   CELULARES — AJUSTES
+========================================================= */
+
+.hero-container > * {
+  min-width: 0;
+}
+
+@media (max-width: 650px) {
+  .hero {
+    padding-top: 120px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 11vw, 4rem);
+  }
+
+  .listen-section,
+  .about-section,
+  .voices-section,
+  .back-community {
+    padding: 72px 0;
+  }
+
+  .principle {
+    min-height: 0;
+    padding-bottom: 32px;
+  }
+
+  .voices-visual {
+    min-height: 320px;
+  }
+
+  .ring-three {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 650px) {
+  .spotify-header a {
+    min-height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .spotify-small {
+    font-size: 0.72rem;
+  }
+}
