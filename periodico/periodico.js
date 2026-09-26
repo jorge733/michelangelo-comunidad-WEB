@@ -16,6 +16,7 @@
   const fullscreenBtn = document.getElementById("fullscreenBtn");
   const editionSelect = document.getElementById("editionSelect");
   const editionSelectWrap = document.getElementById("editionSelectWrap");
+  const soundBtn = document.getElementById("soundBtn");
 
   let reader = null;
   let current = null;
@@ -70,9 +71,10 @@
      LECTOR
   ========================== */
 
-  // En pantallas táctiles se usa el deslizamiento nativo del navegador
-  // (scroll-snap): page-flip escucha cada movimiento del dedo en toda la
-  // página y puede bloquear o alterar el desplazamiento vertical.
+  // En pantallas táctiles page-flip no recibe los toques: su manejo escucha
+  // cada movimiento del dedo en toda la página y altera el desplazamiento
+  // vertical. Aquí solo se detectan deslizamientos horizontales y toques
+  // sobre el libro; el desplazamiento vertical queda en manos del navegador.
   const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
   function updateStatus(first, visible) {
@@ -98,6 +100,45 @@
     image.decoding = "async";
     image.draggable = false;
     return image;
+  }
+
+  function attachTouchGestures(target, reader) {
+    let start = null;
+
+    target.addEventListener("touchstart", (event) => {
+      if (event.touches.length !== 1) {
+        start = null;
+        return;
+      }
+      const touch = event.touches[0];
+      start = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+    }, { passive: true });
+
+    target.addEventListener("touchend", (event) => {
+      if (!start) return;
+
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      const isTap = Math.abs(dx) < 10 && Math.abs(dy) < 10 && Date.now() - start.time < 350;
+      start = null;
+
+      // Deslizamiento claramente horizontal: como pasar la hoja con el dedo.
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx < 0) reader.next();
+        else reader.prev();
+        return;
+      }
+
+      // Toque: mitad derecha avanza, mitad izquierda retrocede.
+      if (isTap) {
+        const bounds = target.getBoundingClientRect();
+        if (touch.clientX - bounds.left > bounds.width / 2) reader.next();
+        else reader.prev();
+      }
+    }, { passive: true });
+
+    target.addEventListener("touchcancel", () => (start = null), { passive: true });
   }
 
   function createFlipReader(edicion, frame) {
@@ -126,8 +167,9 @@
       maxHeight: 932,
       showCover: true,
       usePortrait: true,
+      useMouseEvents: !isTouch,
       maxShadowOpacity: 0.4,
-      flippingTime: 800
+      flippingTime: isTouch ? 650 : 800
     });
 
     // En horizontal se ven dos páginas a la vez, salvo la portada y una contraportada suelta.
@@ -139,52 +181,20 @@
     flip.loadFromHTML(pages);
     flip.on("flip", (event) => report(event.data));
     flip.on("changeOrientation", () => report(flip.getCurrentPageIndex()));
+    flip.on("changeState", (event) => {
+      if (event.data === "flipping") playPageSound();
+    });
     report(0);
 
-    return {
-      next: () => flip.flipNext(),
-      prev: () => flip.flipPrev(),
+    const reader = {
+      next: () => flip.flipNext("bottom"),
+      prev: () => flip.flipPrev("bottom"),
       destroy: () => flip.destroy()
     };
-  }
 
-  function createSwipeReader(edicion, frame) {
-    const track = document.createElement("div");
-    track.className = "page-slider";
-    track.tabIndex = 0;
-    track.setAttribute("aria-label", `${edicion.titulo}: desliza hacia los lados para cambiar de página`);
-    track.style.setProperty("--page-ratio", `${edicion.ancho} / ${edicion.alto}`);
-    frame.append(track);
+    if (isTouch) attachTouchGestures(frame, reader);
 
-    for (let number = 1; number <= edicion.paginas; number++) {
-      const slide = document.createElement("figure");
-      slide.className = "page-slide";
-      slide.append(createPageImage(edicion, number));
-      track.append(slide);
-    }
-
-    const step = () => track.firstElementChild.getBoundingClientRect().width +
-      parseFloat(getComputedStyle(track).columnGap || 0);
-
-    const report = () => {
-      const size = step();
-      const first = Math.round(track.scrollLeft / size);
-      const visible = Math.max(1, Math.round(track.clientWidth / size));
-      updateStatus(Math.min(first, edicion.paginas - 1), visible);
-    };
-
-    track.addEventListener("scroll", report, { passive: true });
-    window.addEventListener("resize", report, { passive: true });
-    report();
-
-    return {
-      next: () => track.scrollBy({ left: step(), behavior: "smooth" }),
-      prev: () => track.scrollBy({ left: -step(), behavior: "smooth" }),
-      destroy: () => {
-        window.removeEventListener("resize", report);
-        track.remove();
-      }
-    };
+    return reader;
   }
 
   function buildBook(edicion) {
@@ -198,14 +208,87 @@
     // en la pantalla (page-flip reescribe los estilos del propio libro).
     const frame = document.createElement("div");
     frame.className = "book-frame";
-    if (!isTouch) {
-      frame.style.maxWidth = `max(300px, calc((100svh - 230px) * ${(2 * edicion.ancho) / edicion.alto}))`;
-    }
+    frame.style.maxWidth = `max(300px, calc((100svh - 230px) * ${(2 * edicion.ancho) / edicion.alto}))`;
     bookStage.append(frame);
 
-    reader = isTouch ? createSwipeReader(edicion, frame) : createFlipReader(edicion, frame);
+    reader = createFlipReader(edicion, frame);
     bookLoading.hidden = true;
   }
+
+
+  /* =========================
+     SONIDO
+  ========================== */
+
+  const SOUND_KEY = "periodico-sonido";
+  const SOUND_VOLUME = 0.35;
+
+  // iOS ignora el volumen de los elementos <audio>, así que el sonido se
+  // reproduce con Web Audio y un control de ganancia. El contexto se crea con
+  // el primer toque o clic, como exigen los navegadores móviles.
+  const pageSound = new Audio("pasar-pagina.mp3");
+  pageSound.preload = "auto";
+  pageSound.volume = SOUND_VOLUME;
+
+  let audioContext = null;
+  let soundBuffer = null;
+
+  function initAudio() {
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (audioContext || !Context) return;
+
+    audioContext = new Context();
+    fetch("pasar-pagina.mp3")
+      .then((response) => response.arrayBuffer())
+      .then((data) => audioContext.decodeAudioData(data))
+      .then((buffer) => (soundBuffer = buffer))
+      .catch(() => {});
+  }
+
+  ["pointerdown", "touchstart", "keydown"].forEach((type) =>
+    document.addEventListener(type, initAudio, { once: true, passive: true })
+  );
+
+  let soundOn = true;
+  try {
+    soundOn = localStorage.getItem(SOUND_KEY) !== "off";
+  } catch {}
+
+  function renderSoundButton() {
+    soundBtn.setAttribute("aria-pressed", String(soundOn));
+    soundBtn.textContent = soundOn ? "🔊 Sonido" : "🔇 Sin sonido";
+  }
+
+  function playPageSound() {
+    if (!soundOn) return;
+
+    try {
+      if (audioContext && soundBuffer) {
+        if (audioContext.state === "suspended") audioContext.resume();
+
+        const source = audioContext.createBufferSource();
+        const gain = audioContext.createGain();
+        source.buffer = soundBuffer;
+        gain.gain.value = SOUND_VOLUME;
+        source.connect(gain).connect(audioContext.destination);
+        source.start();
+        return;
+      }
+
+      pageSound.currentTime = 0;
+      pageSound.play().catch(() => {});
+    } catch {}
+  }
+
+  soundBtn.addEventListener("click", () => {
+    soundOn = !soundOn;
+    try {
+      localStorage.setItem(SOUND_KEY, soundOn ? "on" : "off");
+    } catch {}
+    renderSoundButton();
+  });
+
+  renderSoundButton();
 
   function openEdition(id, { updateUrl = false } = {}) {
     current = ediciones.find((edicion) => edicion.id === id) || ediciones[0];
@@ -257,7 +340,7 @@
   });
 
   if (isTouch) {
-    document.querySelector(".reader-hint").textContent = "Desliza la página hacia los lados para avanzar o retroceder.";
+    document.querySelector(".reader-hint").textContent = "Desliza la página hacia los lados o toca su borde derecho o izquierdo.";
   }
 
   if (!document.fullscreenEnabled) {
