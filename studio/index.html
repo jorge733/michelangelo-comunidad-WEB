@@ -86,12 +86,26 @@
               Contraseña
             </label>
 
-            <input
-              type="password"
-              id="loginPassword"
-              autocomplete="current-password"
-              required
-            >
+            <div class="password-wrapper">
+
+              <input
+                type="password"
+                id="loginPassword"
+                autocomplete="current-password"
+                required
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                id="togglePassword"
+                aria-controls="loginPassword"
+                aria-pressed="false"
+              >
+                Mostrar
+              </button>
+
+            </div>
 
           </div>
 

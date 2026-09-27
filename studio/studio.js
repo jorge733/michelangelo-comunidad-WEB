@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loginForm = $("loginForm");
   const loginEmail = $("loginEmail");
   const loginPassword = $("loginPassword");
+  const togglePassword = $("togglePassword");
   const loginError = $("loginError");
   const loginButton = $("loginButton");
   const logoutButton = $("logoutButton");
@@ -384,6 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       await fb.signInWithEmailAndPassword(auth, email, password);
       loginPassword.value = "";
+      setPasswordVisible(false);
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       showLoginError(getFirebaseAuthMessage(error));
@@ -391,6 +393,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       loginButton.disabled = false;
       loginButton.innerHTML = `Entrar a Studio <span>→</span>`;
     }
+  });
+
+  function setPasswordVisible(visible) {
+    loginPassword.type = visible ? "text" : "password";
+    togglePassword.textContent = visible ? "Ocultar" : "Mostrar";
+    togglePassword.setAttribute("aria-pressed", visible ? "true" : "false");
+    togglePassword.setAttribute("aria-label", visible ? "Ocultar contraseña" : "Mostrar contraseña");
+  }
+
+  togglePassword.addEventListener("click", () => {
+    setPasswordVisible(loginPassword.type === "password");
+    loginPassword.focus();
   });
 
   logoutButton.addEventListener("click", async () => {
