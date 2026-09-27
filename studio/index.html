@@ -164,7 +164,9 @@
       </div>
 
 
-      <nav class="sidebar-nav">
+      <nav class="sidebar-nav" aria-label="Secciones de Studio">
+
+        <p class="sidebar-label">BANDEJA</p>
 
         <button
           class="nav-item active"
@@ -173,6 +175,7 @@
         >
           <span>⌂</span>
           Panel general
+          <em class="nav-count" data-pending-count="todos"></em>
         </button>
 
         <button
@@ -182,6 +185,7 @@
         >
           <span>✎</span>
           Periódico
+          <em class="nav-count" data-pending-count="periodico"></em>
         </button>
 
         <button
@@ -191,6 +195,7 @@
         >
           <span>◇</span>
           Creaciones
+          <em class="nav-count" data-pending-count="creacion"></em>
         </button>
 
         <button
@@ -200,6 +205,7 @@
         >
           <span>◉</span>
           Podcast
+          <em class="nav-count" data-pending-count="podcast"></em>
         </button>
 
         <button
@@ -209,6 +215,18 @@
         >
           <span>✦</span>
           Ideas
+          <em class="nav-count" data-pending-count="idea"></em>
+        </button>
+
+        <p class="sidebar-label">PUBLICAR</p>
+
+        <button
+          class="nav-item"
+          data-view="video"
+          type="button"
+        >
+          <span>▶</span>
+          Video en Vida Michelangelo
         </button>
 
       </nav>
@@ -264,6 +282,8 @@
             id="mobileMenu"
             type="button"
             aria-label="Abrir menú"
+            aria-controls="sidebar"
+            aria-expanded="false"
           >
             ☰
           </button>
@@ -306,247 +326,301 @@
 
       <main class="main">
 
-        <section class="welcome">
+        <!-- =================================================
+             VISTA: BANDEJA
+        ================================================== -->
 
-          <div>
+        <div id="inboxView">
 
-            <p class="eyebrow">
-              PANEL EDITORIAL
+          <section class="welcome">
+
+            <div>
+
+              <p class="eyebrow">
+                PANEL EDITORIAL
+              </p>
+
+              <h2>
+                Aportes de la
+                <em>comunidad.</em>
+              </h2>
+
+            </div>
+
+            <p class="welcome-copy">
+              Revisa las propuestas recibidas, filtra los
+              contenidos y organiza su estado editorial.
             </p>
 
-            <h2>
-              Aportes de la
-              <em>comunidad.</em>
-            </h2>
-
-          </div>
-
-          <p class="welcome-copy">
-            Revisa las propuestas recibidas, filtra los
-            contenidos y organiza su estado editorial.
-          </p>
-
-        </section>
+          </section>
 
 
 
-        <section class="video-publisher" aria-labelledby="videoPublisherTitle">
-          <div>
-            <p class="eyebrow">VIDA MICHELANGELO</p>
-            <h3 id="videoPublisherTitle">Publicar video del encargado de fotografía</h3>
-            <p>Este acceso es privado: el video se publica solamente al confirmar este formulario.</p>
-          </div>
-          <form id="videoPublishForm" class="video-publish-form">
-            <label>Título<input id="videoTitle" required maxlength="120"></label>
-            <label>Descripción<textarea id="videoDescription" required maxlength="800"></textarea></label>
-            <label>Archivo MP4 o WebM (máx. 250 MB)<input id="videoFile" type="file" accept="video/mp4,video/webm" required></label>
-            <button type="submit" class="button-primary" id="videoPublishButton">Publicar video</button>
-            <p id="videoPublishMessage" class="video-publish-message" role="status"></p>
-          </form>
-        </section>
+          <!-- STATS -->
 
-        <!-- STATS -->
+          <section class="stats" aria-label="Resumen por estado">
 
-        <section class="stats">
-
-          <article class="stat-card">
-
-            <span>Total aportes</span>
-
-            <strong id="totalCount">
-              0
-            </strong>
-
-            <small>
-              Todos los contenidos
-            </small>
-
-          </article>
-
-
-          <article class="stat-card pending">
-
-            <span>Pendientes</span>
-
-            <strong id="pendingCount">
-              0
-            </strong>
-
-            <small>
-              Esperando revisión
-            </small>
-
-          </article>
-
-
-          <article class="stat-card reviewing">
-
-            <span>En revisión</span>
-
-            <strong id="reviewCount">
-              0
-            </strong>
-
-            <small>
-              En proceso editorial
-            </small>
-
-          </article>
-
-
-          <article class="stat-card approved">
-
-            <span>Aprobados</span>
-
-            <strong id="approvedCount">
-              0
-            </strong>
-
-            <small>
-              Listos para continuar
-            </small>
-
-          </article>
-
-        </section>
-
-
-
-        <!-- TOOLBAR -->
-
-        <section class="toolbar">
-
-          <div class="search-box">
-
-            <span>⌕</span>
-
-            <input
-              type="search"
-              id="searchInput"
-              placeholder="Buscar por título, nombre o curso..."
-              autocomplete="off"
-            >
-
-          </div>
-
-
-          <div class="filters" id="filters">
-
-            <button
-              type="button"
-              class="filter active"
-              data-filter="todos"
-            >
-              Todos
+            <button type="button" class="stat-card active" data-status-filter="todos">
+              <span>Total aportes</span>
+              <strong id="totalCount">0</strong>
+              <small>Ver todos</small>
             </button>
 
-            <button
-              type="button"
-              class="filter"
-              data-filter="periodico"
-            >
-              Periódico
+            <button type="button" class="stat-card pending" data-status-filter="pendiente">
+              <span>Pendientes</span>
+              <strong id="pendingCount">0</strong>
+              <small>Esperando revisión</small>
             </button>
 
-            <button
-              type="button"
-              class="filter"
-              data-filter="creacion"
-            >
-              Creaciones
+            <button type="button" class="stat-card reviewing" data-status-filter="revision">
+              <span>En revisión</span>
+              <strong id="reviewCount">0</strong>
+              <small>En proceso editorial</small>
             </button>
 
-            <button
-              type="button"
-              class="filter"
-              data-filter="podcast"
-            >
-              Podcast
+            <button type="button" class="stat-card approved" data-status-filter="aprobado">
+              <span>Aprobados</span>
+              <strong id="approvedCount">0</strong>
+              <small>Listos para continuar</small>
             </button>
 
-            <button
-              type="button"
-              class="filter"
-              data-filter="idea"
-            >
-              Ideas
-            </button>
-
-          </div>
-
-        </section>
+          </section>
 
 
 
-        <!-- LIST HEADER -->
+          <!-- TOOLBAR -->
 
-        <section class="list-heading">
+          <section class="toolbar">
 
-          <div>
+            <div class="toolbar-row">
 
-            <p class="eyebrow">
-              BANDEJA EDITORIAL
+              <div class="search-box">
+
+                <span aria-hidden="true">⌕</span>
+
+                <input
+                  type="search"
+                  id="searchInput"
+                  placeholder="Buscar por título, nombre, curso o contenido..."
+                  autocomplete="off"
+                  aria-label="Buscar aportes"
+                >
+
+              </div>
+
+
+              <div class="toolbar-controls">
+
+                <label class="select-control">
+                  <span>Estado</span>
+                  <select id="statusFilter">
+                    <option value="todos">Todos</option>
+                    <option value="pendiente">Pendientes</option>
+                    <option value="revision">En revisión</option>
+                    <option value="aprobado">Aprobados</option>
+                    <option value="rechazado">Rechazados</option>
+                  </select>
+                </label>
+
+                <label class="select-control">
+                  <span>Orden</span>
+                  <select id="sortOrder">
+                    <option value="recientes">Más recientes</option>
+                    <option value="antiguos">Más antiguos</option>
+                  </select>
+                </label>
+
+                <button type="button" class="button-secondary" id="exportButton">
+                  Exportar CSV
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="filters" id="filters">
+
+              <button type="button" class="filter active" data-filter="todos">
+                Todos
+              </button>
+
+              <button type="button" class="filter" data-filter="periodico">
+                Periódico
+              </button>
+
+              <button type="button" class="filter" data-filter="creacion">
+                Creaciones
+              </button>
+
+              <button type="button" class="filter" data-filter="podcast">
+                Podcast
+              </button>
+
+              <button type="button" class="filter" data-filter="idea">
+                Ideas
+              </button>
+
+            </div>
+
+          </section>
+
+
+
+          <!-- LIST HEADER -->
+
+          <section class="list-heading">
+
+            <div>
+
+              <p class="eyebrow">
+                BANDEJA EDITORIAL
+              </p>
+
+              <h3 id="listTitle">
+                Todos los aportes
+              </h3>
+
+            </div>
+
+            <span id="visibleCount" aria-live="polite">
+              0 resultados
+            </span>
+
+          </section>
+
+
+
+          <!-- LOADING -->
+
+          <section
+            class="studio-loading"
+            id="studioLoading"
+          >
+
+            <div class="loading-spinner"></div>
+
+            <p>
+              Cargando aportes...
             </p>
 
-            <h3 id="listTitle">
-              Todos los aportes
+          </section>
+
+
+
+          <!-- SUBMISSIONS -->
+
+          <section
+            class="submission-list"
+            id="submissionList"
+          ></section>
+
+
+
+          <!-- EMPTY -->
+
+          <section
+            class="empty-state"
+            id="emptyState"
+          >
+
+            <div>⌕</div>
+
+            <h3>
+              No encontramos aportes
             </h3>
 
-          </div>
+            <p>
+              Prueba con otro término de búsqueda
+              o cambia los filtros.
+            </p>
 
-          <span id="visibleCount">
-            0 resultados
-          </span>
+            <button type="button" class="button-secondary" id="clearFilters">
+              Limpiar filtros
+            </button>
 
-        </section>
+          </section>
 
-
-
-        <!-- LOADING -->
-
-        <section
-          class="studio-loading"
-          id="studioLoading"
-        >
-
-          <div class="loading-spinner"></div>
-
-          <p>
-            Cargando aportes...
-          </p>
-
-        </section>
+        </div>
 
 
 
-        <!-- SUBMISSIONS -->
+        <!-- =================================================
+             VISTA: VIDEO
+        ================================================== -->
 
-        <section
-          class="submission-list"
-          id="submissionList"
-        ></section>
+        <div id="videoView" hidden>
+
+          <section class="welcome">
+
+            <div>
+
+              <p class="eyebrow">
+                VIDA MICHELANGELO
+              </p>
+
+              <h2>
+                Publicar
+                <em>un video.</em>
+              </h2>
+
+            </div>
+
+            <p class="welcome-copy">
+              Este acceso es privado: el video se publica en
+              Vida Michelangelo solamente al confirmar este formulario.
+            </p>
+
+          </section>
 
 
+          <section class="video-publisher" aria-labelledby="videoPublisherTitle">
 
-        <!-- EMPTY -->
+            <div>
+              <p class="eyebrow">ANTES DE PUBLICAR</p>
+              <h3 id="videoPublisherTitle">Revisa el video completo</h3>
+              <ul class="video-checklist">
+                <li>Las personas que aparecen están de acuerdo con que se publique.</li>
+                <li>El título y la descripción explican de qué trata.</li>
+                <li>El archivo es MP4 o WebM y pesa como máximo 250 MB.</li>
+              </ul>
+            </div>
 
-        <section
-          class="empty-state"
-          id="emptyState"
-        >
+            <form id="videoPublishForm" class="video-publish-form">
 
-          <div>⌕</div>
+              <label>
+                Título
+                <input id="videoTitle" required maxlength="120">
+              </label>
 
-          <h3>
-            No encontramos aportes
-          </h3>
+              <label>
+                Descripción
+                <textarea id="videoDescription" required maxlength="800"></textarea>
+              </label>
 
-          <p>
-            Prueba con otro término de búsqueda
-            o cambia el filtro.
-          </p>
+              <label>
+                Archivo MP4 o WebM (máx. 250 MB)
+                <input id="videoFile" type="file" accept="video/mp4,video/webm" required>
+              </label>
 
-        </section>
+              <p class="video-file-info" id="videoFileInfo" hidden></p>
+
+              <div class="upload-progress" id="videoProgress" hidden>
+                <div class="upload-progress-bar">
+                  <span id="videoProgressBar"></span>
+                </div>
+                <small id="videoProgressText">0%</small>
+              </div>
+
+              <button type="submit" class="button-primary" id="videoPublishButton">Publicar video</button>
+
+              <p id="videoPublishMessage" class="video-publish-message" role="status"></p>
+
+            </form>
+
+          </section>
+
+        </div>
 
       </main>
 
@@ -573,14 +647,42 @@
       aria-labelledby="modalTitle"
     >
 
-      <button
-        type="button"
-        class="modal-close"
-        id="modalClose"
-        aria-label="Cerrar"
-      >
-        ×
-      </button>
+      <div class="modal-toolbar">
+
+        <div class="modal-nav">
+
+          <button
+            type="button"
+            id="modalPrev"
+            aria-label="Aporte anterior"
+            title="Anterior (←)"
+          >
+            ←
+          </button>
+
+          <span id="modalPosition"></span>
+
+          <button
+            type="button"
+            id="modalNext"
+            aria-label="Aporte siguiente"
+            title="Siguiente (→)"
+          >
+            →
+          </button>
+
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          id="modalClose"
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+      </div>
 
 
       <div class="modal-header">
@@ -596,6 +698,14 @@
             class="status-badge"
             id="modalStatus"
           ></span>
+
+          <span
+            class="flag-badge"
+            id="modalAnonymousFlag"
+            hidden
+          >
+            PIDE ANONIMATO
+          </span>
 
         </div>
 
@@ -613,6 +723,26 @@
 
 
       <div class="modal-content">
+
+        <div class="detail-grid detail-grid-top">
+
+          <div>
+            <span>RECIBIDO</span>
+            <strong id="modalDate"></strong>
+          </div>
+
+          <div>
+            <span>PUBLICACIÓN</span>
+            <strong id="modalPrivacy"></strong>
+          </div>
+
+          <div>
+            <span>CONTACTO</span>
+            <strong id="modalContact"></strong>
+          </div>
+
+        </div>
+
 
         <div class="detail-block">
 
@@ -634,49 +764,37 @@
             INFORMACIÓN ADICIONAL
           </span>
 
-          <p id="modalExtra"></p>
+          <dl class="detail-list" id="modalExtra"></dl>
 
         </div>
+
+
+        <div
+          class="detail-block"
+          id="modalDraftBlock"
+          hidden
+        >
+
+          <span>
+            TEXTO O BORRADOR
+          </span>
+
+          <div class="draft-text" id="modalDraft"></div>
+
+          <button type="button" class="text-button" id="copyDraft">
+            Copiar texto
+          </button>
+
+        </div>
+
 
         <div class="detail-block" id="modalAttachmentBlock" hidden>
 
           <span>
-            ARCHIVO ADJUNTO
+            FOTOS ADJUNTAS
           </span>
 
-          <a
-            id="modalAttachment"
-            class="text-link"
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-          ></a>
-
-        </div>
-
-
-        <div class="detail-grid">
-
-          <div>
-
-            <span>
-              RECIBIDO
-            </span>
-
-            <strong id="modalDate"></strong>
-
-          </div>
-
-
-          <div>
-
-            <span>
-              PUBLICACIÓN
-            </span>
-
-            <strong id="modalPrivacy"></strong>
-
-          </div>
+          <div class="attachment-gallery" id="modalAttachments"></div>
 
         </div>
 
@@ -724,7 +842,7 @@
         </div>
 
 
-        <small id="statusHelp">
+        <small id="statusHelp" role="status">
           Los cambios de estado se guardan
           automáticamente en Michelangelo Comunidad.
         </small>
@@ -737,6 +855,37 @@
         >
           Publicar en Creaciones
         </button>
+
+
+        <div class="editorial-note">
+
+          <label for="editorialNote">
+            NOTA INTERNA
+          </label>
+
+          <textarea
+            id="editorialNote"
+            maxlength="4000"
+            placeholder="Comentarios para el equipo: qué falta, a quién contactar, próximos pasos…"
+          ></textarea>
+
+          <div class="editorial-note-footer">
+
+            <small id="noteHelp">
+              Solo la ve el equipo editorial.
+            </small>
+
+            <button
+              type="button"
+              class="button-secondary"
+              id="saveNoteButton"
+            >
+              Guardar nota
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 

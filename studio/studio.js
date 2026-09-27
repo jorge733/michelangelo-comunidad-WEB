@@ -13,113 +13,55 @@ document.addEventListener("DOMContentLoaded", async () => {
     appId: "1:1078337415782:web:0d83ded2c0d35157415ba7"
   };
 
-
-  let firebaseApp;
   let auth;
   let db;
-
-  let signInWithEmailAndPassword;
-  let onAuthStateChanged;
-  let signOut;
-
-  let collection;
-  let addDoc;
-  let getDocs;
-  let onSnapshot;
-  let query;
-  let where;
-  let doc;
-  let updateDoc;
   let storage;
-  let storageRef;
-  let getDownloadURL;
-  let uploadBytes;
-  let serverTimestamp;
-
+  let fb;
 
   try {
+    const [appModule, authModule, firestoreModule, storageModule] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js")
+    ]);
 
-    const firebaseAppModule = await import(
-      "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js"
-    );
+    const firebaseApp = appModule.initializeApp(firebaseConfig);
 
-    const firebaseAuthModule = await import(
-      "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js"
-    );
+    auth = authModule.getAuth(firebaseApp);
+    db = firestoreModule.getFirestore(firebaseApp);
+    storage = storageModule.getStorage(firebaseApp);
 
-    const firebaseFirestoreModule = await import(
-      "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js"
-    );
-
-    const firebaseStorageModule = await import(
-      "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js"
-    );
-
-
-    firebaseApp =
-      firebaseAppModule.initializeApp(firebaseConfig);
-
-
-    auth =
-      firebaseAuthModule.getAuth(firebaseApp);
-
-
-    db =
-      firebaseFirestoreModule.getFirestore(firebaseApp);
-
-    storage =
-      firebaseStorageModule.getStorage(firebaseApp);
-
-
-    signInWithEmailAndPassword =
-      firebaseAuthModule.signInWithEmailAndPassword;
-
-    onAuthStateChanged =
-      firebaseAuthModule.onAuthStateChanged;
-
-    signOut =
-      firebaseAuthModule.signOut;
-
-
-    collection =
-      firebaseFirestoreModule.collection;
-
-    addDoc = firebaseFirestoreModule.addDoc;
-    getDocs = firebaseFirestoreModule.getDocs;
-
-    onSnapshot =
-      firebaseFirestoreModule.onSnapshot;
-
-    query = firebaseFirestoreModule.query;
-    where = firebaseFirestoreModule.where;
-
-    doc =
-      firebaseFirestoreModule.doc;
-
-    updateDoc =
-      firebaseFirestoreModule.updateDoc;
-
-    storageRef = firebaseStorageModule.ref;
-    getDownloadURL = firebaseStorageModule.getDownloadURL;
-    uploadBytes = firebaseStorageModule.uploadBytes;
-    serverTimestamp = firebaseFirestoreModule.serverTimestamp;
-
+    fb = {
+      signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
+      onAuthStateChanged: authModule.onAuthStateChanged,
+      signOut: authModule.signOut,
+      collection: firestoreModule.collection,
+      addDoc: firestoreModule.addDoc,
+      onSnapshot: firestoreModule.onSnapshot,
+      query: firestoreModule.query,
+      where: firestoreModule.where,
+      doc: firestoreModule.doc,
+      updateDoc: firestoreModule.updateDoc,
+      serverTimestamp: firestoreModule.serverTimestamp,
+      storageRef: storageModule.ref,
+      getDownloadURL: storageModule.getDownloadURL,
+      uploadBytesResumable: storageModule.uploadBytesResumable
+    };
 
   } catch (error) {
+    console.error("No fue posible cargar Firebase:", error);
 
-    console.error(
-      "No fue posible cargar Firebase:",
-      error
-    );
+    const loginErrorElement = document.getElementById("loginError");
 
-    showFatalLoginError(
-      "No fue posible conectar Michelangelo Studio con Firebase. Revisa tu conexión a internet e inténtalo nuevamente."
-    );
+    if (loginErrorElement) {
+      loginErrorElement.textContent =
+        "No fue posible conectar Michelangelo Studio con Firebase. Revisa tu conexión a internet e inténtalo nuevamente.";
+      loginErrorElement.classList.add("active");
+    }
 
     return;
-
   }
-
 
 
   /* =====================================================
@@ -127,13 +69,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   let submissions = [];
+  let visibleSubmissions = [];
+  let publishedCreations = new Set();
 
   let currentFilter = "todos";
-
+  let currentStatus = "todos";
   let currentSubmissionId = null;
+  let renderedModalId = null;
+  let noteDirty = false;
+  let lastFocusedElement = null;
 
   let unsubscribeSubmissions = null;
-
+  let unsubscribePublications = null;
 
 
   /* =====================================================
@@ -141,183 +88,130 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   const typeInfo = {
-
-    periodico: {
-      label: "PERIÓDICO",
-      icon: "✎"
-    },
-
-    creacion: {
-      label: "CREACIÓN",
-      icon: "◇"
-    },
-
-    podcast: {
-      label: "PODCAST",
-      icon: "◉"
-    },
-
-    idea: {
-      label: "IDEA",
-      icon: "✦"
-    }
-
+    periodico: { label: "PERIÓDICO", icon: "✎", title: "Aportes para el periódico" },
+    creacion: { label: "CREACIÓN", icon: "◇", title: "Creaciones" },
+    podcast: { label: "PODCAST", icon: "◉", title: "Propuestas para el podcast" },
+    idea: { label: "IDEA", icon: "✦", title: "Ideas para la comunidad" }
   };
-
 
   const statusInfo = {
-
-    pendiente: "PENDIENTE",
-
-    revision: "EN REVISIÓN",
-
-    aprobado: "APROBADO",
-
-    rechazado: "RECHAZADO"
-
+    pendiente: { label: "PENDIENTE", plural: "Pendientes" },
+    revision: { label: "EN REVISIÓN", plural: "En revisión" },
+    aprobado: { label: "APROBADO", plural: "Aprobados" },
+    rechazado: { label: "RECHAZADO", plural: "Rechazados" }
   };
 
+  // Etiquetas legibles para los campos de "detalles". Incluye los nombres
+  // antiguos para que los aportes previos se sigan mostrando bien.
+  const detailLabels = {
+    coautores: "Participan también",
+    tipoContenido: "Tipo de contenido",
+    articleType: "Tipo de contenido",
+    seccion: "Ámbito",
+    etapa: "Etapa",
+    articleStatus: "Etapa",
+    fuentes: "Fuentes o entrevistas",
+    apoyo: "Pide apoyo en",
+    tipoCreacion: "Tipo de creación",
+    creationType: "Tipo de creación",
+    tecnica: "Técnica o materiales",
+    contexto: "Dónde nació",
+    enlace: "Enlace",
+    autoria: "Confirma autoría",
+    permisoPersonas: "Permiso de quienes aparecen",
+    formato: "Formato",
+    participacion: "Participación",
+    preguntas: "Preguntas propuestas",
+    invitados: "Invitados sugeridos",
+    categoriaIdea: "Tipo de idea",
+    porQueInteresante: "Por qué sería interesante",
+    ideaReason: "Por qué sería interesante",
+    recursos: "Qué se necesitaría",
+    quiereAyudar: "Quiere ayudar a realizarla"
+  };
+
+  const hiddenDetails = ["borrador", "archivo", "archivos"];
 
 
   /* =====================================================
-     DOM — LOGIN
+     DOM
   ====================================================== */
 
-  const loginScreen =
-    document.getElementById("loginScreen");
+  const $ = id => document.getElementById(id);
 
-  const studioShell =
-    document.getElementById("studioShell");
+  const loginScreen = $("loginScreen");
+  const studioShell = $("studioShell");
+  const loginForm = $("loginForm");
+  const loginEmail = $("loginEmail");
+  const loginPassword = $("loginPassword");
+  const loginError = $("loginError");
+  const loginButton = $("loginButton");
+  const logoutButton = $("logoutButton");
+  const sidebarUser = $("sidebarUser");
+  const editorAvatar = $("editorAvatar");
 
-  const loginForm =
-    document.getElementById("loginForm");
+  const inboxView = $("inboxView");
+  const videoView = $("videoView");
+  const studioLoading = $("studioLoading");
+  const submissionList = $("submissionList");
+  const emptyState = $("emptyState");
+  const clearFiltersButton = $("clearFilters");
+  const searchInput = $("searchInput");
+  const statusFilter = $("statusFilter");
+  const sortOrder = $("sortOrder");
+  const exportButton = $("exportButton");
+  const filters = document.querySelectorAll(".filter");
+  const navItems = document.querySelectorAll(".nav-item");
+  const statCards = document.querySelectorAll(".stat-card");
+  const pendingBadges = document.querySelectorAll("[data-pending-count]");
+  const listTitle = $("listTitle");
+  const visibleCount = $("visibleCount");
+  const totalCount = $("totalCount");
+  const pendingCount = $("pendingCount");
+  const reviewCount = $("reviewCount");
+  const approvedCount = $("approvedCount");
+  const sidebar = $("sidebar");
+  const mobileMenu = $("mobileMenu");
 
-  const loginEmail =
-    document.getElementById("loginEmail");
+  const modalOverlay = $("modalOverlay");
+  const modal = modalOverlay.querySelector(".modal");
+  const modalClose = $("modalClose");
+  const modalPrev = $("modalPrev");
+  const modalNext = $("modalNext");
+  const modalPosition = $("modalPosition");
+  const modalType = $("modalType");
+  const modalStatus = $("modalStatus");
+  const modalAnonymousFlag = $("modalAnonymousFlag");
+  const modalTitle = $("modalTitle");
+  const modalAuthor = $("modalAuthor");
+  const modalDate = $("modalDate");
+  const modalPrivacy = $("modalPrivacy");
+  const modalContact = $("modalContact");
+  const modalDescription = $("modalDescription");
+  const modalExtra = $("modalExtra");
+  const modalExtraBlock = $("modalExtraBlock");
+  const modalDraftBlock = $("modalDraftBlock");
+  const modalDraft = $("modalDraft");
+  const copyDraft = $("copyDraft");
+  const modalAttachmentBlock = $("modalAttachmentBlock");
+  const modalAttachments = $("modalAttachments");
+  const statusButtons = document.querySelectorAll(".status-actions button");
+  const statusHelp = $("statusHelp");
+  const publishCreationButton = $("publishCreationButton");
+  const editorialNote = $("editorialNote");
+  const noteHelp = $("noteHelp");
+  const saveNoteButton = $("saveNoteButton");
 
-  const loginPassword =
-    document.getElementById("loginPassword");
-
-  const loginError =
-    document.getElementById("loginError");
-
-  const loginButton =
-    document.getElementById("loginButton");
-
-  const logoutButton =
-    document.getElementById("logoutButton");
-
-  const sidebarUser =
-    document.getElementById("sidebarUser");
-
-  const editorAvatar =
-    document.getElementById("editorAvatar");
-
-  const videoPublishForm = document.getElementById("videoPublishForm");
-  const videoTitle = document.getElementById("videoTitle");
-  const videoDescription = document.getElementById("videoDescription");
-  const videoFile = document.getElementById("videoFile");
-  const videoPublishButton = document.getElementById("videoPublishButton");
-  const videoPublishMessage = document.getElementById("videoPublishMessage");
-
-  const studioLoading =
-    document.getElementById("studioLoading");
-
-
-
-  /* =====================================================
-     DOM — STUDIO
-  ====================================================== */
-
-  const submissionList =
-    document.getElementById("submissionList");
-
-  const emptyState =
-    document.getElementById("emptyState");
-
-  const searchInput =
-    document.getElementById("searchInput");
-
-  const filters =
-    document.querySelectorAll(".filter");
-
-  const navItems =
-    document.querySelectorAll(".nav-item");
-
-  const listTitle =
-    document.getElementById("listTitle");
-
-  const visibleCount =
-    document.getElementById("visibleCount");
-
-  const totalCount =
-    document.getElementById("totalCount");
-
-  const pendingCount =
-    document.getElementById("pendingCount");
-
-  const reviewCount =
-    document.getElementById("reviewCount");
-
-  const approvedCount =
-    document.getElementById("approvedCount");
-
-  const modalOverlay =
-    document.getElementById("modalOverlay");
-
-  const modalClose =
-    document.getElementById("modalClose");
-
-  const modalType =
-    document.getElementById("modalType");
-
-  const modalStatus =
-    document.getElementById("modalStatus");
-
-  const modalTitle =
-    document.getElementById("modalTitle");
-
-  const modalAuthor =
-    document.getElementById("modalAuthor");
-
-  const modalDescription =
-    document.getElementById("modalDescription");
-
-  const modalExtra =
-    document.getElementById("modalExtra");
-
-  const modalExtraBlock =
-    document.getElementById("modalExtraBlock");
-
-  const modalDate =
-    document.getElementById("modalDate");
-
-  const modalPrivacy =
-    document.getElementById("modalPrivacy");
-
-  const modalAttachmentBlock =
-    document.getElementById("modalAttachmentBlock");
-
-  const modalAttachment =
-    document.getElementById("modalAttachment");
-
-  const statusButtons =
-    document.querySelectorAll(
-      ".status-actions button"
-    );
-
-  const sidebar =
-    document.getElementById("sidebar");
-
-  const mobileMenu =
-    document.getElementById("mobileMenu");
-
-  const statusHelp =
-    document.getElementById("statusHelp");
-
-  const publishCreationButton =
-    document.getElementById("publishCreationButton");
-
+  const videoPublishForm = $("videoPublishForm");
+  const videoTitle = $("videoTitle");
+  const videoDescription = $("videoDescription");
+  const videoFile = $("videoFile");
+  const videoFileInfo = $("videoFileInfo");
+  const videoProgress = $("videoProgress");
+  const videoProgressBar = $("videoProgressBar");
+  const videoProgressText = $("videoProgressText");
+  const videoPublishButton = $("videoPublishButton");
+  const videoPublishMessage = $("videoPublishMessage");
 
 
   /* =====================================================
@@ -325,671 +219,308 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   function escapeHTML(value) {
-
     return String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
-
   }
 
-
-
-  function normalizeStatus(status) {
-
-    if (statusInfo[status]) {
-      return status;
-    }
-
-    return "pendiente";
-
+  function toMillis(timestamp) {
+    if (!timestamp) return 0;
+    if (typeof timestamp.toMillis === "function") return timestamp.toMillis();
+    if (timestamp.seconds) return timestamp.seconds * 1000;
+    return 0;
   }
 
+  function formatDate(ms, withTime = false) {
+    if (!ms) return "Fecha no disponible";
 
+    return new Intl.DateTimeFormat("es-CL", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      ...(withTime ? { hour: "2-digit", minute: "2-digit" } : {})
+    }).format(new Date(ms));
+  }
 
-  function formatDate(timestamp) {
+  function formatRelative(ms) {
+    if (!ms) return "Sin fecha";
 
-    if (!timestamp) {
-      return "Fecha no disponible";
-    }
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
+    const days = Math.floor((startOfToday.getTime() - ms) / 86400000) + 1;
 
+    if (ms >= startOfToday.getTime()) return "Hoy";
+    if (days === 1) return "Ayer";
+    if (days < 7) return `Hace ${days} días`;
+
+    return new Intl.DateTimeFormat("es-CL", { day: "numeric", month: "short", year: "numeric" }).format(new Date(ms));
+  }
+
+  function formatSize(bytes) {
+    return bytes >= 1024 * 1024
+      ? `${(bytes / (1024 * 1024)).toFixed(1).replace(".", ",")} MB`
+      : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  }
+
+  function isSafeUrl(value) {
     try {
-
-      let date;
-
-
-      if (
-        typeof timestamp.toDate === "function"
-      ) {
-
-        date = timestamp.toDate();
-
-      } else if (
-        timestamp.seconds
-      ) {
-
-        date =
-          new Date(timestamp.seconds * 1000);
-
-      } else {
-
-        date =
-          new Date(timestamp);
-
-      }
-
-
-      if (
-        Number.isNaN(date.getTime())
-      ) {
-
-        return "Fecha no disponible";
-
-      }
-
-
-      return new Intl.DateTimeFormat(
-        "es-CL",
-        {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        }
-      ).format(date);
-
-
+      const url = new URL(value);
+      return url.protocol === "https:" || url.protocol === "http:";
     } catch (error) {
-
-      return "Fecha no disponible";
-
+      return false;
     }
-
   }
 
-
-
-  function buildExtra(data) {
-
-    const parts = [];
-
-    const details =
-      data.detalles || {};
-
-
-    const articleType =
-      details.tipoContenido ||
-      details.articleType;
-
-    const articleStatus =
-      details.etapa ||
-      details.articleStatus;
-
-    const creationType =
-      details.tipoCreacion ||
-      details.creationType;
-
-    const ideaReason =
-      details.porQueInteresante ||
-      details.ideaReason;
-
-    if (articleType) {
-
-      parts.push(
-        `Tipo de contenido: ${articleType}`
-      );
-
-    }
-
-
-    if (articleStatus) {
-
-      parts.push(
-        `Estado del contenido: ${articleStatus}`
-      );
-
-    }
-
-
-    if (creationType) {
-
-      parts.push(
-        `Tipo de creación: ${creationType}`
-      );
-
-    }
-
-
-    if (ideaReason) {
-
-      parts.push(
-        `Motivación: ${ideaReason}`
-      );
-
-    }
-
-
-    if (data.tipo === "podcast") {
-
-      parts.push(
-        data.quiereParticipar
-          ? "Indicó que le gustaría participar en la conversación."
-          : "No indicó interés en participar directamente."
-      );
-
-    }
-
-
-    return parts.join("\n");
-
+  function formatDetailValue(value) {
+    if (Array.isArray(value)) return value.join(", ");
+    if (typeof value === "boolean") return value ? "Sí" : "No";
+    return String(value ?? "");
   }
 
+  function getAttachments(data) {
+    const details = data.detalles || {};
 
+    if (Array.isArray(details.archivos) && details.archivos.length) {
+      return details.archivos.filter(file => file?.ruta);
+    }
 
-  function firestoreToSubmission(
-    firestoreDoc
-  ) {
+    return details.archivo?.ruta ? [details.archivo] : [];
+  }
 
-    const data =
-      firestoreDoc.data();
+  function getDetailRows(data) {
+    const details = data.detalles || {};
+    const rows = Object.entries(details)
+      .filter(([key, value]) => !hiddenDetails.includes(key) && value !== "" && value !== null)
+      .map(([key, value]) => ({ key, label: detailLabels[key] || key, value }));
 
+    // Aportes anteriores al formulario actual solo guardaban la casilla.
+    if ((data.tipo === "podcast" && !details.participacion) || (data.tipo === "idea" && details.quiereAyudar === undefined)) {
+      rows.push({
+        key: "quiereParticipar",
+        label: "Quiere participar",
+        value: Boolean(data.quiereParticipar)
+      });
+    }
+
+    return rows;
+  }
+
+  function firestoreToSubmission(firestoreDoc) {
+    const data = firestoreDoc.data();
+    const createdMs = toMillis(data.creadoEn);
 
     return {
-
-      id:
-        firestoreDoc.id,
-
+      id: firestoreDoc.id,
       raw: data,
-
-      type:
-        data.tipo || "idea",
-
-      title:
-        data.titulo || "Sin título",
-
-      name:
-        data.anonimoPublicamente
-          ? "Anónimo"
-          : data.nombre || "Sin nombre",
-
-      realName:
-        data.nombre || "Sin nombre",
-
-      course:
-        data.curso || "Curso no indicado",
-
-      description:
-        data.descripcion || "",
-
-      extra:
-        buildExtra(data),
-
-      anonymous:
-        Boolean(
-          data.anonimoPublicamente
-        ),
-
-      wantsToParticipate:
-        Boolean(
-          data.quiereParticipar
-        ),
-
-      status:
-        normalizeStatus(
-          data.estado
-        ),
-
-      date:
-        formatDate(
-          data.creadoEn
-        ),
-
-      createdAt:
-        data.creadoEn || null
-
+      type: typeInfo[data.tipo] ? data.tipo : "idea",
+      title: data.titulo || "Sin título",
+      realName: data.nombre || "Sin nombre",
+      course: data.curso || "Curso no indicado",
+      contact: data.contacto || "",
+      description: data.descripcion || "",
+      draft: data.detalles?.borrador || "",
+      details: getDetailRows(data),
+      attachments: getAttachments(data),
+      anonymous: Boolean(data.anonimoPublicamente),
+      status: statusInfo[data.estado] ? data.estado : "pendiente",
+      note: data.notaEditorial || "",
+      updatedBy: data.actualizadoPor || "",
+      updatedMs: toMillis(data.actualizadoEn),
+      createdMs
     };
-
   }
-
-
-
-  function showLoginError(message) {
-
-    loginError.textContent =
-      message;
-
-    loginError.classList.add(
-      "active"
-    );
-
-  }
-
-
-
-  function clearLoginError() {
-
-    loginError.textContent = "";
-
-    loginError.classList.remove(
-      "active"
-    );
-
-  }
-
-
-
-  function showFatalLoginError(message) {
-    const loginErrorElement =
-      document.getElementById("loginError");
-
-    if (!loginErrorElement) {
-      return;
-    }
-    loginErrorElement.textContent = message;
-    loginErrorElement.classList.add("active");
-
-  }
-
-
-
-  function getFirebaseAuthMessage(error) {
-
-    const code =
-      error?.code || "";
-
-
-    switch (code) {
-
-      case "auth/invalid-email":
-
-        return "El correo electrónico no es válido.";
-
-
-      case "auth/invalid-credential":
-
-        return "El correo o la contraseña no son correctos.";
-
-
-      case "auth/user-disabled":
-
-        return "Esta cuenta se encuentra deshabilitada.";
-
-
-      case "auth/too-many-requests":
-
-        return "Se realizaron demasiados intentos. Espera un momento antes de volver a intentarlo.";
-
-
-      case "auth/network-request-failed":
-
-        return "No fue posible conectarse con Firebase. Revisa tu conexión a internet.";
-
-
-      default:
-
-        return "No fue posible iniciar sesión. Revisa tus datos e inténtalo nuevamente.";
-
-    }
-
-  }
-
 
 
   /* =====================================================
-     AUTHENTICATION
+     AUTENTICACIÓN
   ====================================================== */
 
-  loginForm.addEventListener(
-    "submit",
-    async event => {
+  function showLoginError(message) {
+    loginError.textContent = message;
+    loginError.classList.add("active");
+  }
 
-      event.preventDefault();
+  function clearLoginError() {
+    loginError.textContent = "";
+    loginError.classList.remove("active");
+  }
 
-      clearLoginError();
-
-
-      const email =
-        loginEmail.value
-          .trim();
-
-      const password =
-        loginPassword.value;
-
-
-      if (!email || !password) {
-
-        showLoginError(
-          "Ingresa tu correo electrónico y contraseña."
-        );
-
-        return;
-
-      }
-
-
-      loginButton.disabled = true;
-
-      loginButton.innerHTML =
-        `Ingresando... <span>→</span>`;
-
-
-      try {
-
-        await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-
-
-        loginPassword.value = "";
-
-
-      } catch (error) {
-
-        console.error(
-          "Error al iniciar sesión:",
-          error
-        );
-
-
-        showLoginError(
-          getFirebaseAuthMessage(error)
-        );
-
-
-      } finally {
-
-        loginButton.disabled = false;
-
-        loginButton.innerHTML =
-          `Entrar a Studio <span>→</span>`;
-
-      }
-
+  function getFirebaseAuthMessage(error) {
+    switch (error?.code || "") {
+      case "auth/invalid-email":
+        return "El correo electrónico no es válido.";
+      case "auth/invalid-credential":
+        return "El correo o la contraseña no son correctos.";
+      case "auth/user-disabled":
+        return "Esta cuenta se encuentra deshabilitada.";
+      case "auth/too-many-requests":
+        return "Se realizaron demasiados intentos. Espera un momento antes de volver a intentarlo.";
+      case "auth/network-request-failed":
+        return "No fue posible conectarse con Firebase. Revisa tu conexión a internet.";
+      default:
+        return "No fue posible iniciar sesión. Revisa tus datos e inténtalo nuevamente.";
     }
+  }
 
-  );
-
-
-
-  logoutButton.addEventListener(
-    "click",
-    async () => {
-
-      try {
-
-        await signOut(auth);
-
-      } catch (error) {
-
-        console.error(
-          "No fue posible cerrar sesión:",
-          error
-        );
-
-      }
-
-    }
-
-  );
-
-
-
-  onAuthStateChanged(
-    auth,
-    user => {
-
-      if (user) {
-
-        showStudio(user);
-
-        subscribeToSubmissions();
-
-      } else {
-
-        showLogin();
-
-        stopSubmissionsListener();
-
-      }
-
-    }
-
-  );
-
-
-
-  function showStudio(user) {
-
-    loginScreen.hidden = true;
-
-    studioShell.hidden = false;
-
-
-    const email =
-      user.email || "Usuario autorizado";
-
-
-    sidebarUser.textContent =
-      email;
-
-
-    const firstCharacter =
-      email
-        .charAt(0)
-        .toUpperCase();
-
-
-    editorAvatar.textContent =
-      firstCharacter || "M";
-
-
+  loginForm.addEventListener("submit", async event => {
+    event.preventDefault();
     clearLoginError();
 
-  }
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
 
-
-
-  function showLogin() {
-
-    studioShell.hidden = true;
-
-    loginScreen.hidden = false;
-
-
-    submissions = [];
-
-    currentSubmissionId = null;
-
-
-    updateStats();
-
-    renderSubmissions();
-
-
-    if (modalOverlay) {
-
-      modalOverlay.classList.remove(
-        "active"
-      );
-
-      modalOverlay.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
+    if (!email || !password) {
+      showLoginError("Ingresa tu correo electrónico y contraseña.");
+      return;
     }
 
+    loginButton.disabled = true;
+    loginButton.innerHTML = `Ingresando... <span>→</span>`;
 
-    document.body.style.overflow = "";
+    try {
+      await fb.signInWithEmailAndPassword(auth, email, password);
+      loginPassword.value = "";
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      showLoginError(getFirebaseAuthMessage(error));
+    } finally {
+      loginButton.disabled = false;
+      loginButton.innerHTML = `Entrar a Studio <span>→</span>`;
+    }
+  });
 
+  logoutButton.addEventListener("click", async () => {
+    try {
+      await fb.signOut(auth);
+    } catch (error) {
+      console.error("No fue posible cerrar sesión:", error);
+    }
+  });
+
+  fb.onAuthStateChanged(auth, user => {
+    // Las sesiones anónimas del formulario público no dan acceso a Studio.
+    if (user && !user.isAnonymous) {
+      showStudio(user);
+      subscribeToSubmissions();
+      subscribeToPublications();
+    } else {
+      showLogin();
+      stopListeners();
+    }
+  });
+
+  function showStudio(user) {
+    loginScreen.hidden = true;
+    studioShell.hidden = false;
+
+    const email = user.email || "Usuario autorizado";
+
+    sidebarUser.textContent = email;
+    editorAvatar.textContent = email.charAt(0).toUpperCase() || "M";
+    editorAvatar.title = email;
+
+    clearLoginError();
   }
 
+  function showLogin() {
+    studioShell.hidden = true;
+    loginScreen.hidden = false;
+
+    submissions = [];
+    publishedCreations = new Set();
+
+    if (modalOverlay.classList.contains("active")) {
+      noteDirty = false;
+      closeModal();
+    }
+
+    updateStats();
+    renderSubmissions();
+  }
 
 
   /* =====================================================
-     FIRESTORE — APORTES
+     FIRESTORE
   ====================================================== */
 
   function subscribeToSubmissions() {
-
-    stopSubmissionsListener();
-
+    stopListener("submissions");
 
     studioLoading.hidden = false;
-
     submissionList.innerHTML = "";
+    emptyState.classList.remove("active");
 
-    emptyState.classList.remove(
-      "active"
-    );
+    unsubscribeSubmissions = fb.onSnapshot(
+      fb.collection(db, "aportes"),
+      snapshot => {
+        submissions = snapshot.docs.map(firestoreToSubmission);
+        studioLoading.hidden = true;
 
+        updateStats();
+        renderSubmissions();
 
-    const aportesCollection =
-      collection(
-        db,
-        "aportes"
-      );
-
-
-    unsubscribeSubmissions =
-      onSnapshot(
-
-        aportesCollection,
-
-        snapshot => {
-
-          submissions =
-            snapshot.docs.map(
-              firestoreToSubmission
-            );
-
-
-          submissions.sort(
-            (a, b) => {
-
-              const getMilliseconds =
-                value => {
-
-                  if (!value) {
-                    return 0;
-                  }
-
-                  if (
-                    typeof value.toMillis ===
-                    "function"
-                  ) {
-
-                    return value.toMillis();
-
-                  }
-
-                  if (value.seconds) {
-
-                    return (
-                      value.seconds * 1000
-                    );
-
-                  }
-
-                  return 0;
-
-                };
-
-
-              return (
-                getMilliseconds(
-                  b.createdAt
-                ) -
-                getMilliseconds(
-                  a.createdAt
-                )
-              );
-
-            }
-          );
-
-
-          studioLoading.hidden = true;
-
-
-          updateStats();
-
-          renderSubmissions();
-
-
-          if (
-            currentSubmissionId
-          ) {
-
-            const current =
-              submissions.find(
-                item =>
-                  item.id ===
-                  currentSubmissionId
-              );
-
-
-            if (current) {
-
-              populateModal(
-                current
-              );
-
-            }
-
-          }
-
-        },
-
-        error => {
-
-          console.error(
-            "Error leyendo aportes:",
-            error
-          );
-
-
-          studioLoading.hidden = true;
-
-          submissionList.innerHTML = `
-            <div style="
-              padding: 45px 20px;
-              border-top: 1px solid var(--border);
-              color: var(--terracotta);
-              font-size: .8rem;
-            ">
-              No fue posible cargar los aportes.
-              Revisa la conexión con Firebase.
-            </div>
-          `;
-
+        if (currentSubmissionId) {
+          const current = submissions.find(item => item.id === currentSubmissionId);
+          if (current) populateModal(current);
         }
-
-      );
-
+      },
+      error => {
+        console.error("Error leyendo aportes:", error);
+        studioLoading.hidden = true;
+        submissionList.innerHTML = `
+          <div class="list-error">
+            No fue posible cargar los aportes. Revisa la conexión con Firebase
+            y que tu cuenta esté autorizada como editora.
+          </div>`;
+      }
+    );
   }
 
+  // Las publicaciones son públicas; las escuchamos para saber qué
+  // creaciones ya están en la sección Creaciones.
+  function subscribeToPublications() {
+    stopListener("publications");
 
+    unsubscribePublications = fb.onSnapshot(
+      fb.query(fb.collection(db, "publicaciones"), fb.where("seccion", "==", "creaciones")),
+      snapshot => {
+        publishedCreations = new Set(snapshot.docs.map(item => item.data().aporteId).filter(Boolean));
+        renderSubmissions();
 
-  function stopSubmissionsListener() {
+        const current = submissions.find(item => item.id === currentSubmissionId);
+        if (current) updatePublishButton(current);
+      },
+      error => console.error("Error leyendo publicaciones:", error)
+    );
+  }
 
-    if (
-      typeof unsubscribeSubmissions ===
-      "function"
-    ) {
-
+  function stopListener(name) {
+    if (name === "submissions" && typeof unsubscribeSubmissions === "function") {
       unsubscribeSubmissions();
-
       unsubscribeSubmissions = null;
-
     }
 
+    if (name === "publications" && typeof unsubscribePublications === "function") {
+      unsubscribePublications();
+      unsubscribePublications = null;
+    }
   }
 
+  function stopListeners() {
+    stopListener("submissions");
+    stopListener("publications");
+  }
+
+  function editorStamp() {
+    return {
+      actualizadoEn: fb.serverTimestamp(),
+      actualizadoPor: auth.currentUser?.email || ""
+    };
+  }
 
 
   /* =====================================================
@@ -997,63 +528,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   function getFilteredSubmissions() {
+    const search = searchInput.value.trim().toLowerCase();
 
-    const search =
-      searchInput.value
-        .trim()
-        .toLowerCase();
+    const results = submissions.filter(item => {
+      if (currentFilter !== "todos" && item.type !== currentFilter) return false;
+      if (currentStatus !== "todos" && item.status !== currentStatus) return false;
+      if (!search) return true;
 
+      return [
+        item.title,
+        item.realName,
+        item.course,
+        item.contact,
+        item.description,
+        item.draft,
+        item.note,
+        typeInfo[item.type].label,
+        ...item.details.map(detail => formatDetailValue(detail.value))
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+    });
 
-    return submissions.filter(
-      item => {
+    const direction = sortOrder.value === "antiguos" ? 1 : -1;
 
-        const matchesType =
-          currentFilter === "todos" ||
-          item.type === currentFilter;
-
-
-        const type =
-          typeInfo[item.type];
-
-
-        const searchableText = [
-
-          item.title,
-
-          item.name,
-
-          item.realName,
-
-          item.course,
-
-          item.description,
-
-          type
-            ? type.label
-            : item.type
-
-        ]
-          .join(" ")
-          .toLowerCase();
-
-
-        const matchesSearch =
-          !search ||
-          searchableText.includes(
-            search
-          );
-
-
-        return (
-          matchesType &&
-          matchesSearch
-        );
-
-      }
-    );
-
+    return results.sort((a, b) => direction * (a.createdMs - b.createdMs));
   }
-
 
 
   /* =====================================================
@@ -1061,36 +562,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   function updateStats() {
+    const countStatus = status => submissions.filter(item => item.status === status).length;
 
-    totalCount.textContent =
-      submissions.length;
+    totalCount.textContent = submissions.length;
+    pendingCount.textContent = countStatus("pendiente");
+    reviewCount.textContent = countStatus("revision");
+    approvedCount.textContent = countStatus("aprobado");
 
-
-    pendingCount.textContent =
-      submissions.filter(
-        item =>
-          item.status ===
-          "pendiente"
+    pendingBadges.forEach(badge => {
+      const type = badge.dataset.pendingCount;
+      const count = submissions.filter(item =>
+        item.status === "pendiente" && (type === "todos" || item.type === type)
       ).length;
 
-
-    reviewCount.textContent =
-      submissions.filter(
-        item =>
-          item.status ===
-          "revision"
-      ).length;
-
-
-    approvedCount.textContent =
-      submissions.filter(
-        item =>
-          item.status ===
-          "aprobado"
-      ).length;
-
+      badge.textContent = count || "";
+      badge.title = count ? `${count} pendientes` : "";
+    });
   }
-
 
 
   /* =====================================================
@@ -1098,647 +586,539 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   function renderSubmissions() {
-
-    const results =
-      getFilteredSubmissions();
-
-
+    visibleSubmissions = getFilteredSubmissions();
     submissionList.innerHTML = "";
 
-
     visibleCount.textContent =
-      `${results.length} ${
-        results.length === 1
-          ? "resultado"
-          : "resultados"
-      }`;
+      `${visibleSubmissions.length} ${visibleSubmissions.length === 1 ? "resultado" : "resultados"}`;
 
+    const hasFilters = currentFilter !== "todos" || currentStatus !== "todos" || searchInput.value.trim();
+    clearFiltersButton.hidden = !hasFilters;
 
-    if (
-      results.length === 0
-    ) {
-
-      if (
-        studioLoading.hidden
-      ) {
-
-        emptyState.classList.add(
-          "active"
-        );
-
-      }
-
+    if (visibleSubmissions.length === 0) {
+      emptyState.classList.toggle("active", studioLoading.hidden);
       return;
-
     }
 
+    emptyState.classList.remove("active");
 
-    emptyState.classList.remove(
-      "active"
-    );
+    const fragment = document.createDocumentFragment();
 
+    visibleSubmissions.forEach(item => {
+      const type = typeInfo[item.type];
+      const article = document.createElement("article");
+      const chips = [];
 
-    results.forEach(
-      item => {
-
-        const type =
-          typeInfo[item.type] ||
-          typeInfo.idea;
-
-
-        const article =
-          document.createElement(
-            "article"
-          );
-
-
-        article.className =
-          "submission-card";
-
-
-        article.dataset.id =
-          item.id;
-
-
-        article.innerHTML = `
-
-          <div class="submission-type">
-
-            <span
-              class="type-badge type-${escapeHTML(item.type)}"
-            >
-              ${type.icon}
-              ${type.label}
-            </span>
-
-            <small>
-              ${escapeHTML(item.date)}
-            </small>
-
-          </div>
-
-
-          <div class="submission-content">
-
-            <h4>
-              ${escapeHTML(item.title)}
-            </h4>
-
-            <p>
-              ${escapeHTML(item.name)}
-              ·
-              ${escapeHTML(item.course)}
-            </p>
-
-          </div>
-
-
-          <div class="submission-status">
-
-            <span
-              class="status-badge status-${escapeHTML(item.status)}"
-            >
-              ${statusInfo[item.status]}
-            </span>
-
-          </div>
-
-
-          <div class="open-arrow">
-            →
-          </div>
-
-        `;
-
-
-        article.addEventListener(
-          "click",
-          () =>
-            openSubmission(
-              item.id
-            )
-        );
-
-
-        submissionList.appendChild(
-          article
-        );
-
+      if (item.attachments.length) {
+        chips.push(`${item.attachments.length} ${item.attachments.length === 1 ? "foto" : "fotos"}`);
       }
-    );
+      if (item.draft) chips.push("Incluye texto");
+      if (item.contact) chips.push("Con correo");
+      if (item.note) chips.push("Con nota");
+      if (publishedCreations.has(item.id)) chips.push("Publicada");
 
+      article.className = `submission-card${item.status === "pendiente" ? " is-pending" : ""}`;
+      article.dataset.id = item.id;
+      article.tabIndex = 0;
+      article.setAttribute("role", "button");
+      article.setAttribute("aria-label", `Abrir aporte: ${item.title}`);
+
+      article.innerHTML = `
+        <div class="submission-type">
+          <span class="type-badge type-${item.type}">${type.icon} ${type.label}</span>
+          <small title="${escapeHTML(formatDate(item.createdMs, true))}">${escapeHTML(formatRelative(item.createdMs))}</small>
+        </div>
+
+        <div class="submission-content">
+          <h4>${escapeHTML(item.title)}</h4>
+          <p>
+            ${escapeHTML(item.realName)} · ${escapeHTML(item.course)}
+            ${item.anonymous ? '<span class="anon-mark">· pide anonimato</span>' : ""}
+          </p>
+          ${item.description ? `<p class="submission-excerpt">${escapeHTML(item.description.slice(0, 180))}${item.description.length > 180 ? "…" : ""}</p>` : ""}
+          ${chips.length ? `<div class="submission-chips">${chips.map(chip => `<span>${escapeHTML(chip)}</span>`).join("")}</div>` : ""}
+        </div>
+
+        <div class="submission-status">
+          <span class="status-badge status-${item.status}">${statusInfo[item.status].label}</span>
+        </div>
+
+        <div class="open-arrow" aria-hidden="true">→</div>
+      `;
+
+      fragment.append(article);
+    });
+
+    submissionList.append(fragment);
   }
 
+  submissionList.addEventListener("click", event => {
+    const card = event.target.closest(".submission-card");
+    if (card) openSubmission(card.dataset.id);
+  });
+
+  submissionList.addEventListener("keydown", event => {
+    const card = event.target.closest(".submission-card");
+
+    if (card && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      openSubmission(card.dataset.id);
+    }
+  });
 
 
   /* =====================================================
-     FILTROS
+     FILTROS Y VISTAS
   ====================================================== */
 
-  function setFilter(filter) {
+  function updateListTitle() {
+    const base = currentFilter === "todos" ? "Todos los aportes" : typeInfo[currentFilter].title;
 
-    currentFilter = filter;
-
-
-    filters.forEach(
-      button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.filter ===
-            filter
-        );
-
-      }
-    );
-
-
-    navItems.forEach(
-      button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.filter ===
-            filter
-        );
-
-      }
-    );
-
-
-    const titles = {
-
-      todos:
-        "Todos los aportes",
-
-      periodico:
-        "Aportes para el periódico",
-
-      creacion:
-        "Creaciones",
-
-      podcast:
-        "Propuestas para el podcast",
-
-      idea:
-        "Ideas para la comunidad"
-
-    };
-
-
-    listTitle.textContent =
-      titles[filter] ||
-      titles.todos;
-
-
-    renderSubmissions();
-
-
-    if (
-      window.innerWidth <= 800
-    ) {
-
-      sidebar.classList.remove(
-        "active"
-      );
-
-    }
-
+    listTitle.textContent = currentStatus === "todos"
+      ? base
+      : `${base} · ${statusInfo[currentStatus].plural}`;
   }
 
+  function showView(view) {
+    inboxView.hidden = view !== "inbox";
+    videoView.hidden = view !== "video";
+
+    navItems.forEach(button => {
+      const active = view === "video"
+        ? button.dataset.view === "video"
+        : button.dataset.filter === currentFilter;
+
+      button.classList.toggle("active", active);
+    });
+
+    closeSidebar();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function setFilter(filter) {
+    currentFilter = typeInfo[filter] ? filter : "todos";
+
+    filters.forEach(button => {
+      button.classList.toggle("active", button.dataset.filter === currentFilter);
+    });
+
+    updateListTitle();
+    renderSubmissions();
+  }
+
+  function setStatus(status) {
+    currentStatus = statusInfo[status] ? status : "todos";
+    statusFilter.value = currentStatus;
+
+    statCards.forEach(card => {
+      card.classList.toggle("active", card.dataset.statusFilter === currentStatus);
+    });
+
+    updateListTitle();
+    renderSubmissions();
+  }
+
+  filters.forEach(button => {
+    button.addEventListener("click", () => {
+      setFilter(button.dataset.filter);
+      navItems.forEach(item => {
+        item.classList.toggle("active", item.dataset.filter === currentFilter);
+      });
+    });
+  });
+
+  navItems.forEach(button => {
+    button.addEventListener("click", () => {
+      if (button.dataset.view === "video") {
+        showView("video");
+        return;
+      }
+
+      setFilter(button.dataset.filter);
+      showView("inbox");
+    });
+  });
+
+  statCards.forEach(card => {
+    card.addEventListener("click", () => setStatus(card.dataset.statusFilter));
+  });
+
+  statusFilter.addEventListener("change", () => setStatus(statusFilter.value));
+  sortOrder.addEventListener("change", renderSubmissions);
+  searchInput.addEventListener("input", renderSubmissions);
+
+  clearFiltersButton.addEventListener("click", () => {
+    searchInput.value = "";
+    setFilter("todos");
+    setStatus("todos");
+    navItems.forEach(item => {
+      item.classList.toggle("active", item.dataset.filter === "todos");
+    });
+  });
 
 
-  filters.forEach(
-    button => {
+  /* =====================================================
+     EXPORTAR CSV
+  ====================================================== */
 
-      button.addEventListener(
-        "click",
-        () => {
+  function csvCell(value) {
+    return `"${String(value ?? "").replaceAll('"', '""')}"`;
+  }
 
-          setFilter(
-            button.dataset.filter
-          );
+  exportButton.addEventListener("click", () => {
+    const header = [
+      "Fecha", "Tipo", "Estado", "Título", "Nombre", "Curso", "Correo",
+      "Pide anonimato", "Propuesta", "Detalles", "Fotos", "Nota interna"
+    ];
 
-        }
-      );
+    const rows = visibleSubmissions.map(item => [
+      formatDate(item.createdMs, true),
+      typeInfo[item.type].label,
+      statusInfo[item.status].label,
+      item.title,
+      item.realName,
+      item.course,
+      item.contact,
+      item.anonymous ? "Sí" : "No",
+      item.description,
+      item.details.map(detail => `${detail.label}: ${formatDetailValue(detail.value)}`).join(" | "),
+      item.attachments.length,
+      item.note
+    ]);
 
-    }
-  );
+    // Punto y coma y BOM para que Excel en español lo abra correctamente.
+    const csv = "﻿" + [header, ...rows].map(row => row.map(csvCell).join(";")).join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
 
+    link.href = url;
+    link.download = `aportes-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
 
-
-  navItems.forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          setFilter(
-            button.dataset.filter
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-
-  searchInput.addEventListener(
-    "input",
-    renderSubmissions
-  );
-
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
 
 
   /* =====================================================
      MODAL
   ====================================================== */
 
+  function confirmDiscardNote() {
+    return !noteDirty || window.confirm("Tienes una nota interna sin guardar. ¿Quieres descartarla?");
+  }
+
   function openSubmission(id) {
+    const item = submissions.find(submission => submission.id === id);
 
-    const item =
-      submissions.find(
-        submission =>
-          submission.id === id
-      );
-
-
-    if (!item) {
+    if (!item || (currentSubmissionId && currentSubmissionId !== id && !confirmDiscardNote())) {
       return;
     }
 
+    if (!modalOverlay.classList.contains("active")) {
+      lastFocusedElement = document.activeElement;
+    }
 
-    currentSubmissionId =
-      id;
-
+    currentSubmissionId = id;
+    noteDirty = false;
 
     populateModal(item);
 
-
-    modalOverlay.classList.add(
-      "active"
-    );
-
-
-    modalOverlay.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    document.body.style.overflow =
-      "hidden";
-
+    modalOverlay.classList.add("active");
+    modalOverlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    modal.scrollTop = 0;
+    modalClose.focus({ preventScroll: true });
   }
 
-
-
   function populateModal(item) {
+    const type = typeInfo[item.type];
+    const isNewItem = renderedModalId !== item.id;
 
-    const type =
-      typeInfo[item.type] ||
-      typeInfo.idea;
+    modalType.textContent = `${type.icon} ${type.label}`;
+    modalType.className = `type-badge type-${item.type}`;
+    modalStatus.textContent = statusInfo[item.status].label;
+    modalStatus.className = `status-badge status-${item.status}`;
+    modalAnonymousFlag.hidden = !item.anonymous;
 
+    modalTitle.textContent = item.title;
+    modalAuthor.textContent = `${item.realName} · ${item.course}`;
 
-    modalType.textContent =
-      `${type.icon} ${type.label}`;
+    modalDate.textContent = formatDate(item.createdMs, true);
+    modalPrivacy.textContent = item.anonymous ? "Publicar como «Anónimo»" : "Puede aparecer su nombre";
 
+    modalContact.innerHTML = item.contact
+      ? `<a class="text-link" href="mailto:${encodeURIComponent(item.contact).replace("%40", "@")}">${escapeHTML(item.contact)}</a>`
+      : "No dejó correo";
 
-    modalType.className =
-      `type-badge type-${item.type}`;
+    modalDescription.textContent = item.description || "Sin descripción.";
 
+    modalExtraBlock.hidden = item.details.length === 0;
+    modalExtra.innerHTML = item.details.map(detail => {
+      const value = formatDetailValue(detail.value);
+      const content = detail.key === "enlace" && isSafeUrl(value)
+        ? `<a class="text-link" href="${escapeHTML(value)}" target="_blank" rel="noopener noreferrer">${escapeHTML(value)}</a>`
+        : escapeHTML(value);
 
-    modalStatus.textContent =
-      statusInfo[item.status];
+      return `<div><dt>${escapeHTML(detail.label)}</dt><dd>${content}</dd></div>`;
+    }).join("");
 
+    modalDraftBlock.hidden = !item.draft;
+    modalDraft.textContent = item.draft;
 
-    modalStatus.className =
-      `status-badge status-${item.status}`;
+    statusButtons.forEach(button => {
+      button.classList.toggle("active", button.dataset.status === item.status);
+      button.setAttribute("aria-pressed", button.dataset.status === item.status ? "true" : "false");
+    });
 
+    updatePublishButton(item);
+    updateModalNavigation();
 
-    modalTitle.textContent =
-      item.title;
-
-
-    modalAuthor.textContent =
-      `${item.name} · ${item.course}`;
-
-
-    modalDescription.textContent =
-      item.description;
-
-
-    if (item.extra) {
-
-      modalExtraBlock.style.display =
-        "block";
-
-      modalExtra.textContent =
-        item.extra;
-
-    } else {
-
-      modalExtraBlock.style.display =
-        "none";
-
-      modalExtra.textContent = "";
-
+    // Estos elementos solo se reconstruyen al cambiar de aporte, para que
+    // una actualización en vivo no borre lo que se está escribiendo.
+    if (isNewItem) {
+      renderedModalId = item.id;
+      editorialNote.value = item.note;
+      statusHelp.textContent = item.updatedBy
+        ? `Último cambio por ${item.updatedBy}${item.updatedMs ? `, ${formatDate(item.updatedMs, true)}` : ""}.`
+        : "Los cambios de estado se guardan automáticamente en Michelangelo Comunidad.";
+      noteHelp.textContent = "Solo la ve el equipo editorial.";
+      loadAttachments(item);
+    } else if (!noteDirty) {
+      editorialNote.value = item.note;
     }
+  }
 
+  function loadAttachments(item) {
+    modalAttachmentBlock.hidden = item.attachments.length === 0;
+    modalAttachments.innerHTML = "";
 
-    modalDate.textContent =
-      item.date;
+    item.attachments.forEach(file => {
+      const figure = document.createElement("figure");
+      const link = document.createElement("a");
+      const caption = document.createElement("figcaption");
 
+      link.className = "attachment-thumb is-loading";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Cargando…";
+      caption.textContent = [file.nombre, file.tamano ? formatSize(file.tamano) : ""].filter(Boolean).join(" · ");
 
-    modalPrivacy.textContent =
-      item.anonymous
-        ? "Publicar de forma anónima"
-        : "Puede aparecer su nombre";
+      figure.append(link, caption);
+      modalAttachments.append(figure);
 
-    const attachment = item.raw?.detalles?.archivo;
-
-    modalAttachmentBlock.hidden = !attachment?.ruta;
-
-    if (attachment?.ruta) {
-      modalAttachment.textContent = "Cargando archivo adjunto...";
-      modalAttachment.removeAttribute("href");
-      modalAttachment.dataset.path = attachment.ruta;
-
-      getDownloadURL(storageRef(storage, attachment.ruta))
+      fb.getDownloadURL(fb.storageRef(storage, file.ruta))
         .then(url => {
-          if (modalAttachment.dataset.path !== attachment.ruta) return;
-          modalAttachment.href = url;
-          modalAttachment.textContent = attachment.nombre || "Abrir archivo adjunto";
+          if (renderedModalId !== item.id) return;
+
+          const image = document.createElement("img");
+          image.src = url;
+          image.alt = file.nombre ? `Foto adjunta: ${file.nombre}` : "Foto adjunta";
+          image.loading = "lazy";
+
+          link.href = url;
+          link.textContent = "";
+          link.classList.remove("is-loading");
+          link.append(image);
         })
         .catch(error => {
           console.error("No fue posible cargar el adjunto:", error);
-          if (modalAttachment.dataset.path !== attachment.ruta) return;
-          modalAttachment.textContent = "No fue posible abrir el archivo adjunto.";
+          if (renderedModalId !== item.id) return;
+          link.classList.remove("is-loading");
+          link.textContent = "No fue posible abrir la foto.";
         });
-    } else {
-      delete modalAttachment.dataset.path;
-    }
-
-
-    statusButtons.forEach(
-      button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.status ===
-            item.status
-        );
-
-      }
-    );
-
-    publishCreationButton.hidden = !(
-      item.type === "creacion" && item.status === "aprobado"
-    );
-
+    });
   }
 
+  function updatePublishButton(item) {
+    const canPublish = item.type === "creacion" && item.status === "aprobado";
+    const published = publishedCreations.has(item.id);
 
+    publishCreationButton.hidden = !canPublish && !published;
+    publishCreationButton.disabled = published;
+    publishCreationButton.textContent = published ? "✓ Publicada en Creaciones" : "Publicar en Creaciones";
+  }
+
+  function updateModalNavigation() {
+    const index = visibleSubmissions.findIndex(item => item.id === currentSubmissionId);
+
+    modalPrev.disabled = index <= 0;
+    modalNext.disabled = index === -1 || index >= visibleSubmissions.length - 1;
+    modalPosition.textContent = index === -1 ? "" : `${index + 1} de ${visibleSubmissions.length}`;
+  }
+
+  function moveInModal(step) {
+    const index = visibleSubmissions.findIndex(item => item.id === currentSubmissionId);
+    const next = visibleSubmissions[index + step];
+
+    if (index !== -1 && next) {
+      openSubmission(next.id);
+    }
+  }
 
   function closeModal() {
+    if (!confirmDiscardNote()) {
+      return;
+    }
 
-    modalOverlay.classList.remove(
-      "active"
-    );
-
-
-    modalOverlay.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
+    modalOverlay.classList.remove("active");
+    modalOverlay.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
 
-
     currentSubmissionId = null;
+    renderedModalId = null;
+    noteDirty = false;
 
+    if (lastFocusedElement && document.contains(lastFocusedElement)) {
+      lastFocusedElement.focus({ preventScroll: true });
+    } else {
+      const card = submissionList.querySelector(".submission-card");
+      if (card) card.focus({ preventScroll: true });
+    }
   }
 
+  modalClose.addEventListener("click", closeModal);
+  modalPrev.addEventListener("click", () => moveInModal(-1));
+  modalNext.addEventListener("click", () => moveInModal(1));
 
+  modalOverlay.addEventListener("click", event => {
+    if (event.target === modalOverlay) closeModal();
+  });
 
-  modalClose.addEventListener(
-    "click",
-    closeModal
-  );
+  document.addEventListener("keydown", event => {
+    if (!modalOverlay.classList.contains("active")) return;
 
-
-
-  modalOverlay.addEventListener(
-    "click",
-    event => {
-
-      if (
-        event.target ===
-        modalOverlay
-      ) {
-
-        closeModal();
-
-      }
-
+    if (event.key === "Escape") {
+      closeModal();
+      return;
     }
-  );
 
+    const typing = event.target instanceof Element && event.target.matches("textarea, input, select");
 
+    if (!typing && event.key === "ArrowLeft") moveInModal(-1);
+    if (!typing && event.key === "ArrowRight") moveInModal(1);
 
-  document.addEventListener(
-    "keydown",
-    event => {
+    // Mantiene el foco dentro del diálogo.
+    if (event.key === "Tab") {
+      const focusable = Array.from(
+        modal.querySelectorAll("button:not([disabled]):not([hidden]), a[href], textarea")
+      ).filter(element => element.offsetParent !== null);
 
-      if (
-        event.key === "Escape" &&
-        modalOverlay.classList.contains(
-          "active"
-        )
-      ) {
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
 
-        closeModal();
-
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
-
     }
-  );
+  });
 
+  copyDraft.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(modalDraft.textContent);
+      copyDraft.textContent = "Texto copiado ✓";
+    } catch (error) {
+      copyDraft.textContent = "No se pudo copiar";
+    }
+
+    setTimeout(() => {
+      copyDraft.textContent = "Copiar texto";
+    }, 2000);
+  });
 
 
   /* =====================================================
-     CAMBIAR ESTADO — FIRESTORE
+     CAMBIAR ESTADO Y NOTA — FIRESTORE
   ====================================================== */
 
-  statusButtons.forEach(
-    button => {
+  statusButtons.forEach(button => {
+    button.addEventListener("click", async () => {
+      const item = submissions.find(submission => submission.id === currentSubmissionId);
+      const newStatus = button.dataset.status;
 
-      button.addEventListener(
-        "click",
-        async () => {
+      if (!item || !statusInfo[newStatus] || item.status === newStatus) {
+        return;
+      }
 
-          if (
-            !currentSubmissionId
-          ) {
+      statusButtons.forEach(statusButton => {
+        statusButton.disabled = true;
+      });
+      statusHelp.textContent = "Guardando cambio...";
 
-            return;
+      try {
+        await fb.updateDoc(fb.doc(db, "aportes", item.id), {
+          estado: newStatus,
+          ...editorStamp()
+        });
 
-          }
+        statusHelp.textContent = `Estado cambiado a «${statusInfo[newStatus].label.toLowerCase()}».`;
 
+      } catch (error) {
+        console.error("Error actualizando estado:", error);
+        statusHelp.textContent = "No fue posible guardar el cambio. Inténtalo nuevamente.";
 
-          const newStatus =
-            button.dataset.status;
+      } finally {
+        statusButtons.forEach(statusButton => {
+          statusButton.disabled = false;
+        });
+      }
+    });
+  });
 
+  editorialNote.addEventListener("input", () => {
+    noteDirty = true;
+    noteHelp.textContent = "Cambios sin guardar.";
+  });
 
-          if (
-            !statusInfo[newStatus]
-          ) {
-
-            return;
-
-          }
-
-
-          const item =
-            submissions.find(
-              submission =>
-                submission.id ===
-                currentSubmissionId
-            );
-
-
-          if (!item) {
-            return;
-          }
-
-
-          const oldStatus =
-            item.status;
-
-
-          statusButtons.forEach(
-            statusButton => {
-
-              statusButton.disabled =
-                true;
-
-            }
-          );
-
-
-          if (statusHelp) {
-
-            statusHelp.textContent =
-              "Guardando cambio...";
-
-          }
-
-
-          try {
-
-            const documentReference =
-              doc(
-                db,
-                "aportes",
-                currentSubmissionId
-              );
-
-
-            await updateDoc(
-              documentReference,
-              {
-                estado:
-                  newStatus
-              }
-            );
-
-
-            item.status =
-              newStatus;
-
-
-            modalStatus.textContent =
-              statusInfo[newStatus];
-
-
-            modalStatus.className =
-              `status-badge status-${newStatus}`;
-
-
-            statusButtons.forEach(
-              statusButton => {
-
-                statusButton.classList.toggle(
-                  "active",
-                  statusButton.dataset.status ===
-                    newStatus
-                );
-
-              }
-            );
-
-
-            updateStats();
-
-            renderSubmissions();
-
-
-            if (statusHelp) {
-
-              statusHelp.textContent =
-                "Cambio guardado correctamente en Michelangelo Comunidad.";
-
-            }
-
-
-          } catch (error) {
-
-            console.error(
-              "Error actualizando estado:",
-              error
-            );
-
-
-            item.status =
-              oldStatus;
-
-
-            if (statusHelp) {
-
-              statusHelp.textContent =
-                "No fue posible guardar el cambio. Inténtalo nuevamente.";
-
-            }
-
-          } finally {
-
-            statusButtons.forEach(
-              statusButton => {
-
-                statusButton.disabled =
-                  false;
-
-              }
-            );
-
-          }
-
-        }
-      );
-
+  editorialNote.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      saveNoteButton.click();
     }
-  );
+  });
+
+  saveNoteButton.addEventListener("click", async () => {
+    if (!currentSubmissionId) return;
+
+    saveNoteButton.disabled = true;
+    noteHelp.textContent = "Guardando nota...";
+
+    try {
+      await fb.updateDoc(fb.doc(db, "aportes", currentSubmissionId), {
+        notaEditorial: editorialNote.value.trim(),
+        ...editorStamp()
+      });
+
+      noteDirty = false;
+      noteHelp.textContent = "Nota guardada ✓";
+
+    } catch (error) {
+      console.error("Error guardando la nota:", error);
+      noteHelp.textContent = "No fue posible guardar la nota. Inténtalo nuevamente.";
+
+    } finally {
+      saveNoteButton.disabled = false;
+    }
+  });
 
 
+  /* =====================================================
+     PUBLICAR CREACIÓN
+  ====================================================== */
 
   publishCreationButton.addEventListener("click", async () => {
     const item = submissions.find(submission => submission.id === currentSubmissionId);
 
-    if (!item || item.type !== "creacion" || item.status !== "aprobado") {
+    if (!item || item.type !== "creacion" || item.status !== "aprobado" || publishedCreations.has(item.id)) {
+      return;
+    }
+
+    const author = item.anonymous ? "Anónimo" : item.realName;
+
+    if (!window.confirm(`Se publicará «${item.title}» en Creaciones con autoría «${author}». ¿Continuar?`)) {
       return;
     }
 
@@ -1746,48 +1126,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     publishCreationButton.textContent = "Publicando...";
 
     try {
-      const existing = await getDocs(
-        query(collection(db, "publicaciones"), where("aporteId", "==", item.id))
-      );
-
-      if (!existing.empty) {
-        statusHelp.textContent = "Esta creación ya fue publicada.";
-        return;
-      }
-
-      const attachment = item.raw?.detalles?.archivo || null;
-      const imageUrl = attachment?.ruta
-        ? await getDownloadURL(storageRef(storage, attachment.ruta))
+      const attachment = item.attachments[0] || null;
+      const imageUrl = attachment
+        ? await fb.getDownloadURL(fb.storageRef(storage, attachment.ruta))
         : null;
 
-      await addDoc(collection(db, "publicaciones"), {
+      await fb.addDoc(fb.collection(db, "publicaciones"), {
         seccion: "creaciones",
         aporteId: item.id,
         titulo: item.title,
         descripcion: item.description,
-        autor: item.anonymous ? "Anónimo" : item.realName,
+        autor: author,
         archivo: attachment,
         imagenUrl: imageUrl,
-        publicadoEn: serverTimestamp()
+        publicadoEn: fb.serverTimestamp()
       });
 
+      publishedCreations.add(item.id);
       statusHelp.textContent = "Creación publicada correctamente.";
-      publishCreationButton.hidden = true;
+
     } catch (error) {
       console.error("No fue posible publicar la creación:", error);
       statusHelp.textContent = "No fue posible publicar la creación. Inténtalo nuevamente.";
+
     } finally {
-      publishCreationButton.disabled = false;
-      publishCreationButton.textContent = "Publicar en Creaciones";
+      updatePublishButton(item);
+      renderSubmissions();
+    }
+  });
+
+
+  /* =====================================================
+     PUBLICAR VIDEO
+  ====================================================== */
+
+  const VIDEO_TYPES = { "video/mp4": "mp4", "video/webm": "webm" };
+  const VIDEO_MAX_SIZE = 250 * 1024 * 1024;
+
+  function isValidVideo(file) {
+    return file && VIDEO_TYPES[file.type] && file.size <= VIDEO_MAX_SIZE;
+  }
+
+  videoFile.addEventListener("change", () => {
+    const file = videoFile.files?.[0];
+
+    videoFileInfo.hidden = !file;
+    videoFileInfo.classList.toggle("is-error", Boolean(file) && !isValidVideo(file));
+
+    if (file) {
+      videoFileInfo.textContent = isValidVideo(file)
+        ? `${file.name} · ${formatSize(file.size)}`
+        : `${file.name} no es un MP4 o WebM de hasta 250 MB (${formatSize(file.size)}).`;
     }
   });
 
   videoPublishForm.addEventListener("submit", async event => {
     event.preventDefault();
-    const file = videoFile.files?.[0];
-    const allowedTypes = ["video/mp4", "video/webm"];
 
-    if (!file || !allowedTypes.includes(file.type) || file.size > 250 * 1024 * 1024) {
+    const file = videoFile.files?.[0];
+
+    if (!isValidVideo(file)) {
       videoPublishMessage.textContent = "Selecciona un video MP4 o WebM de hasta 250 MB.";
       return;
     }
@@ -1795,80 +1193,88 @@ document.addEventListener("DOMContentLoaded", async () => {
     videoPublishButton.disabled = true;
     videoPublishButton.textContent = "Subiendo video…";
     videoPublishMessage.textContent = "La carga puede tardar unos minutos. No cierres esta página.";
+    videoProgress.hidden = false;
+    videoProgressBar.style.width = "0%";
+    videoProgressText.textContent = "0%";
 
     try {
-      const extension = file.name.split(".").pop().toLowerCase();
-      const objectId = doc(collection(db, "publicaciones")).id;
-      const path = `publicaciones/${objectId}/videos/video.${extension}`;
-      const videoReference = storageRef(storage, path);
+      const objectId = fb.doc(fb.collection(db, "publicaciones")).id;
+      const path = `publicaciones/${objectId}/videos/video.${VIDEO_TYPES[file.type]}`;
+      const videoReference = fb.storageRef(storage, path);
 
-      await uploadBytes(videoReference, file, { contentType: file.type });
-      const videoUrl = await getDownloadURL(videoReference);
+      await new Promise((resolve, reject) => {
+        fb.uploadBytesResumable(videoReference, file, { contentType: file.type }).on(
+          "state_changed",
+          snapshot => {
+            const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            videoProgressBar.style.width = `${percent}%`;
+            videoProgressText.textContent =
+              `${percent}% · ${formatSize(snapshot.bytesTransferred)} de ${formatSize(snapshot.totalBytes)}`;
+          },
+          reject,
+          resolve
+        );
+      });
 
-      await addDoc(collection(db, "publicaciones"), {
+      const videoUrl = await fb.getDownloadURL(videoReference);
+
+      await fb.addDoc(fb.collection(db, "publicaciones"), {
         seccion: "vida",
         titulo: videoTitle.value.trim(),
         descripcion: videoDescription.value.trim(),
         autor: "Michelangelo Comunidad",
         archivo: { ruta: path, nombre: file.name, tipo: file.type, tamano: file.size },
         videoUrl,
-        publicadoEn: serverTimestamp()
+        publicadoEn: fb.serverTimestamp()
       });
 
       videoPublishForm.reset();
-      videoPublishMessage.textContent = "Video publicado correctamente en Vida Michelangelo.";
+      videoFileInfo.hidden = true;
+      videoProgress.hidden = true;
+      videoPublishMessage.innerHTML =
+        'Video publicado correctamente. <a class="text-link" href="../vida/" target="_blank" rel="noopener">Ver en Vida Michelangelo →</a>';
+
     } catch (error) {
       console.error("No fue posible publicar el video:", error);
       videoPublishMessage.textContent = "No fue posible publicar el video. Revisa la conexión e inténtalo nuevamente.";
+
     } finally {
       videoPublishButton.disabled = false;
       videoPublishButton.textContent = "Publicar video";
     }
   });
 
+  window.addEventListener("beforeunload", event => {
+    if (videoPublishButton.disabled || noteDirty) {
+      event.preventDefault();
+    }
+  });
+
+
   /* =====================================================
-     MOBILE SIDEBAR
+     MENÚ MÓVIL
   ====================================================== */
 
-  mobileMenu.addEventListener(
-    "click",
-    () => {
+  function closeSidebar() {
+    sidebar.classList.remove("active");
+    mobileMenu.setAttribute("aria-expanded", "false");
+  }
 
-      sidebar.classList.toggle(
-        "active"
-      );
+  mobileMenu.addEventListener("click", () => {
+    const open = sidebar.classList.toggle("active");
+    mobileMenu.setAttribute("aria-expanded", open ? "true" : "false");
+  });
 
+  document.addEventListener("click", event => {
+    if (
+      window.innerWidth <= 800 &&
+      sidebar.classList.contains("active") &&
+      !sidebar.contains(event.target) &&
+      !mobileMenu.contains(event.target)
+    ) {
+      closeSidebar();
     }
-  );
-
-
-
-  document.addEventListener(
-    "click",
-    event => {
-
-      if (
-        window.innerWidth <= 800 &&
-        sidebar.classList.contains(
-          "active"
-        ) &&
-        !sidebar.contains(
-          event.target
-        ) &&
-        !mobileMenu.contains(
-          event.target
-        )
-      ) {
-
-        sidebar.classList.remove(
-          "active"
-        );
-
-      }
-
-    }
-  );
-
+  });
 
 
   /* =====================================================
@@ -1876,9 +1282,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ====================================================== */
 
   studioLoading.hidden = true;
-
   updateStats();
-
   renderSubmissions();
 
 });

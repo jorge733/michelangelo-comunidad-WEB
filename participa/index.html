@@ -428,6 +428,27 @@
           >
 
 
+          <!-- BORRADOR RECUPERADO -->
+
+          <div
+            class="draft-notice"
+            id="draftNotice"
+            role="status"
+            hidden
+          >
+
+            <p id="draftNoticeText"></p>
+
+            <button
+              type="button"
+              id="discardDraft"
+            >
+              Empezar de cero
+            </button>
+
+          </div>
+
+
           <!-- DATOS DEL ESTUDIANTE -->
 
           <div class="form-block">
@@ -444,6 +465,8 @@
                 <p>
                   Necesitamos algunos datos para poder
                   contactarte respecto de tu propuesta.
+                  Lo que escribas se guarda en este navegador
+                  hasta que lo envíes.
                 </p>
               </div>
 
@@ -497,6 +520,52 @@
                   <option>Otro</option>
 
                 </select>
+
+              </div>
+
+
+              <div class="field">
+
+                <label for="contactEmail">
+                  Correo para contactarte
+                  <small class="optional">(opcional)</small>
+                </label>
+
+                <small class="field-hint" id="contactEmail-hint">
+                  Solo lo verá el equipo editorial, nunca se publica.
+                </small>
+
+                <input
+                  type="email"
+                  id="contactEmail"
+                  name="contactEmail"
+                  autocomplete="email"
+                  inputmode="email"
+                  maxlength="200"
+                  aria-describedby="contactEmail-hint"
+                >
+
+              </div>
+
+
+              <div class="field">
+
+                <label for="coauthors">
+                  ¿Lo hiciste con alguien más?
+                  <small class="optional">(opcional)</small>
+                </label>
+
+                <small class="field-hint" id="coauthors-hint">
+                  Nombres y cursos de quienes participan contigo.
+                </small>
+
+                <input
+                  type="text"
+                  id="coauthors"
+                  name="coauthors"
+                  maxlength="300"
+                  aria-describedby="coauthors-hint"
+                >
 
               </div>
 
@@ -686,6 +755,11 @@
           ¡Gracias por
           <em>participar!</em>
         </h2>
+
+        <p
+          class="success-summary"
+          id="successSummary"
+        ></p>
 
         <p>
           Tu propuesta fue enviada correctamente y será revisada por el equipo

@@ -20,9 +20,11 @@ service cloud.firestore {
     // puede revisarlos y cambiar su estado, sin borrarlos desde el cliente.
     match /aportes/{aporteId} {
       allow create: if request.resource.data.keys().hasOnly([
-          'tipo', 'nombre', 'curso', 'anonimoPublicamente', 'titulo',
+          'tipo', 'nombre', 'curso', 'contacto', 'anonimoPublicamente', 'titulo',
           'descripcion', 'detalles', 'quiereParticipar', 'estado', 'creadoEn'
         ])
+        && request.resource.data.get('contacto', '') is string
+        && request.resource.data.get('contacto', '').size() <= 200
         && request.resource.data.tipo in ['periodico', 'creacion', 'podcast', 'idea']
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.nombre is string
@@ -34,18 +36,23 @@ service cloud.firestore {
         && request.resource.data.descripcion is string
         && request.resource.data.descripcion.size() <= 5000
         && request.resource.data.detalles is map
-        && request.resource.data.detalles.size() <= 10
+        && request.resource.data.detalles.size() <= 20
         && request.resource.data.anonimoPublicamente is bool
         && request.resource.data.quiereParticipar is bool
         && request.resource.data.creadoEn == request.time;
 
       allow read: if isEditor();
-      // Studio solo puede cambiar el estado editorial; el aporte conserva
-      // siempre su información original y su preferencia de anonimato.
+      // Studio solo puede cambiar el estado editorial y su nota interna; el
+      // aporte conserva siempre su información original y su preferencia de
+      // anonimato.
       allow update: if isEditor()
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['estado'])
-        && request.resource.data.estado in ['pendiente', 'revision', 'aprobado', 'rechazado'];
+          .hasOnly(['estado', 'notaEditorial', 'actualizadoEn', 'actualizadoPor'])
+        && request.resource.data.estado in ['pendiente', 'revision', 'aprobado', 'rechazado']
+        && request.resource.data.get('notaEditorial', '') is string
+        && request.resource.data.get('notaEditorial', '').size() <= 4000
+        && request.resource.data.get('actualizadoPor', '') is string
+        && request.resource.data.get('actualizadoEn', request.time) == request.time;
       allow delete: if false;
     }
 
