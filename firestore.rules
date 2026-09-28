@@ -63,9 +63,13 @@ service cloud.firestore {
       allow create: if isEditor()
         && request.resource.data.keys().hasOnly([
           'seccion', 'aporteId', 'titulo', 'descripcion', 'autor', 'archivo',
-          'imagenUrl', 'videoUrl', 'publicadoEn'
+          'imagenUrl', 'videoUrl', 'publicadoEn', 'fecha', 'hora', 'lugar'
         ])
-        && request.resource.data.seccion in ['creaciones', 'vida']
+        && request.resource.data.seccion in ['creaciones', 'vida', 'centro', 'calendario']
+        // Las actividades del calendario guardan su día como AAAA-MM-DD.
+        && (request.resource.data.seccion != 'calendario'
+          || (request.resource.data.get('fecha', '') is string
+            && request.resource.data.get('fecha', '').matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
         && request.resource.data.titulo is string
         && request.resource.data.descripcion is string
         && request.resource.data.autor is string

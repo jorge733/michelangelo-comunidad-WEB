@@ -424,6 +424,20 @@ a {
 .button-primary:disabled { cursor: wait; opacity: .65; }
 .video-publish-message { min-height: 1.2em; color: var(--ink-soft); font-size: .7rem; }
 
+/* CALENDARIO */
+
+.calendar-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.calendar-manager { margin-top: 24px; padding: 30px; border: 1px solid var(--border); background: var(--cream-light); }
+.calendar-manager h3 { margin-bottom: 16px; font-family: var(--serif); font-size: 1.5rem; }
+.calendar-manager-list { display: grid; gap: 8px; list-style: none; }
+.calendar-manager-list li { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 1px solid var(--border); background: var(--paper); font-size: .78rem; }
+.calendar-manager-list li.is-empty { justify-content: flex-start; color: var(--ink-soft); }
+.calendar-manager-list strong { display: block; font-size: .85rem; }
+.calendar-manager-list small { color: var(--ink-soft); }
+.calendar-remove { flex-shrink: 0; padding: 7px 11px; border: 1px solid var(--border); color: var(--ink); background: transparent; cursor: pointer; font: inherit; font-size: .68rem; font-weight: 700; }
+.calendar-remove:hover { border-color: #8c4c36; color: #8c4c36; }
+.calendar-remove:disabled { cursor: wait; opacity: .6; }
+
 /* STATS */
 
 .stats {
@@ -976,6 +990,7 @@ a {
 @media (max-width: 1050px) {
 
   .video-publisher { grid-template-columns: 1fr; }
+  .calendar-form-row { grid-template-columns: 1fr; }
 
   .stats {
     grid-template-columns: repeat(2, 1fr);

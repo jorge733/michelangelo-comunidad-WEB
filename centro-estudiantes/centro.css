@@ -1,0 +1,368 @@
+/* =========================================================
+   MICHELANGELO COMUNIDAD
+   centro.css — Centro de Estudiantes
+========================================================= */
+
+.center-hero-actions {
+  margin-top: 32px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 14px;
+}
+
+.public-hero .center-hero-actions .button {
+  margin-top: 0;
+}
+
+.center-container {
+  width: min(90%, var(--max-width));
+
+  margin: auto;
+}
+
+.center-roles,
+.center-calendar,
+.center-news {
+  padding: 110px 0;
+}
+
+.center-roles {
+  background: var(--paper);
+}
+
+.center-roles h2,
+.center-calendar h2,
+.center-news h2 {
+  max-width: 820px;
+
+  font-family: var(--serif);
+  font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+  font-weight: 600;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+
+  color: var(--ink);
+}
+
+.center-roles h2 em,
+.center-calendar h2 em,
+.center-news h2 em {
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   QUÉ HACEMOS
+========================================================= */
+
+.center-roles-grid {
+  margin-top: 56px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  border-top: 1px solid var(--border);
+}
+
+.center-role {
+  padding: 34px 28px 10px 0;
+}
+
+.center-role + .center-role {
+  padding-left: 28px;
+
+  border-left: 1px solid var(--border);
+}
+
+.center-role span {
+  font-family: var(--serif);
+  font-size: 0.9rem;
+
+  color: var(--terracotta);
+}
+
+.center-role h3 {
+  margin: 18px 0 12px;
+
+  font-family: var(--serif);
+  font-size: 1.9rem;
+  font-weight: 600;
+
+  color: var(--ink);
+}
+
+.center-role p {
+  line-height: 1.65;
+
+  color: var(--ink-soft);
+}
+
+
+/* =========================================================
+   CALENDARIO
+========================================================= */
+
+.center-calendar {
+  background: var(--cream);
+}
+
+.center-calendar > .center-container > .calendar-list {
+  margin-top: 50px;
+}
+
+.calendar-list {
+  display: grid;
+
+  gap: 12px;
+}
+
+.calendar-month {
+  margin-top: 22px;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  color: var(--terracotta);
+}
+
+.calendar-month:first-child {
+  margin-top: 0;
+}
+
+.calendar-event {
+  padding: 20px 24px;
+
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: start;
+
+  gap: 24px;
+
+  border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: var(--paper);
+}
+
+.calendar-day {
+  padding: 10px 0 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  border-radius: 4px;
+
+  color: var(--cream-light);
+
+  background: var(--green-dark);
+}
+
+.calendar-day small {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  opacity: 0.8;
+}
+
+.calendar-day strong {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.calendar-copy h4 {
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.15;
+
+  color: var(--ink);
+}
+
+.calendar-copy p {
+  max-width: 720px;
+
+  margin-top: 8px;
+
+  white-space: pre-line;
+  line-height: 1.6;
+
+  color: var(--ink-soft);
+}
+
+.calendar-copy .calendar-meta {
+  margin-top: 6px;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: var(--green);
+}
+
+.calendar-past {
+  margin-top: 34px;
+}
+
+.calendar-past summary {
+  width: fit-content;
+
+  cursor: pointer;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: var(--green-dark);
+}
+
+.calendar-past .calendar-list {
+  margin-top: 22px;
+
+  opacity: 0.75;
+}
+
+.calendar-past .calendar-day {
+  background: var(--ink-soft);
+}
+
+
+/* =========================================================
+   COMUNICADOS
+========================================================= */
+
+.center-news {
+  background: var(--paper);
+}
+
+.center-news-list {
+  margin-top: 50px;
+
+  display: grid;
+
+  gap: 18px;
+}
+
+.center-notice {
+  padding: 30px 34px;
+
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green-dark);
+  border-radius: 4px;
+
+  background: var(--cream-light);
+}
+
+.center-notice time {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  color: var(--green);
+}
+
+.center-notice h3 {
+  margin: 10px 0 14px;
+
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.1;
+
+  color: var(--ink);
+}
+
+.center-notice p {
+  max-width: 760px;
+
+  white-space: pre-line;
+  line-height: 1.7;
+
+  color: var(--ink-soft);
+}
+
+.center-notice small {
+  display: block;
+
+  margin-top: 18px;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   CELULARES
+========================================================= */
+
+@media (max-width: 950px) {
+  .center-roles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .center-role:nth-child(3) {
+    padding-left: 0;
+
+    border-left: 0;
+  }
+
+  .center-role:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 650px) {
+  .center-roles,
+  .center-calendar,
+  .center-news {
+    padding: 70px 0;
+  }
+
+  .calendar-event {
+    padding: 16px;
+
+    grid-template-columns: 58px 1fr;
+
+    gap: 16px;
+  }
+
+  .calendar-day strong {
+    font-size: 1.6rem;
+  }
+
+  .center-container {
+    width: 88%;
+  }
+
+  .center-hero-actions .button {
+    width: 100%;
+  }
+
+  .center-roles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .center-role,
+  .center-role + .center-role {
+    padding: 26px 0 8px;
+
+    border-left: 0;
+  }
+
+  .center-role + .center-role {
+    border-top: 1px solid var(--border);
+  }
+
+  .center-notice {
+    padding: 24px 22px;
+  }
+}

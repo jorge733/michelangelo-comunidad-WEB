@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let unsubscribeSubmissions = null;
   let unsubscribePublications = null;
+  let unsubscribeCalendar = null;
 
 
   /* =====================================================
@@ -213,6 +214,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   const videoProgressText = $("videoProgressText");
   const videoPublishButton = $("videoPublishButton");
   const videoPublishMessage = $("videoPublishMessage");
+
+  const centerView = $("centerView");
+  const centerPublishForm = $("centerPublishForm");
+  const centerTitle = $("centerTitle");
+  const centerText = $("centerText");
+  const centerSignature = $("centerSignature");
+  const centerPublishButton = $("centerPublishButton");
+  const centerPublishMessage = $("centerPublishMessage");
+
+  const calendarView = $("calendarView");
+  const calendarPublishForm = $("calendarPublishForm");
+  const calendarTitle = $("calendarTitle");
+  const calendarDate = $("calendarDate");
+  const calendarTime = $("calendarTime");
+  const calendarPlace = $("calendarPlace");
+  const calendarDescription = $("calendarDescription");
+  const calendarPublishButton = $("calendarPublishButton");
+  const calendarPublishMessage = $("calendarPublishMessage");
+  const calendarManagerList = $("calendarManagerList");
 
 
   /* =====================================================
@@ -421,6 +441,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       showStudio(user);
       subscribeToSubmissions();
       subscribeToPublications();
+      subscribeToCalendar();
     } else {
       showLogin();
       stopListeners();
@@ -522,11 +543,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       unsubscribePublications();
       unsubscribePublications = null;
     }
+
+    if (name === "calendar" && typeof unsubscribeCalendar === "function") {
+      unsubscribeCalendar();
+      unsubscribeCalendar = null;
+    }
   }
 
   function stopListeners() {
     stopListener("submissions");
     stopListener("publications");
+    stopListener("calendar");
   }
 
   function editorStamp() {
@@ -696,11 +723,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   function showView(view) {
     inboxView.hidden = view !== "inbox";
     videoView.hidden = view !== "video";
+    centerView.hidden = view !== "centro";
+    calendarView.hidden = view !== "calendario";
 
     navItems.forEach(button => {
-      const active = view === "video"
-        ? button.dataset.view === "video"
-        : button.dataset.filter === currentFilter;
+      const active = view === "inbox"
+        ? button.dataset.filter === currentFilter
+        : button.dataset.view === view;
 
       button.classList.toggle("active", active);
     });
@@ -743,8 +772,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   navItems.forEach(button => {
     button.addEventListener("click", () => {
-      if (button.dataset.view === "video") {
-        showView("video");
+      if (button.dataset.view) {
+        showView(button.dataset.view);
         return;
       }
 
@@ -1258,8 +1287,193 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  /* =====================================================
+     PUBLICAR COMUNICADO DEL CENTRO DE ESTUDIANTES
+  ====================================================== */
+
+  centerPublishForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const title = centerTitle.value.trim();
+    const text = centerText.value.trim();
+    const signature = centerSignature.value.trim() || "Centro de Estudiantes Michelangelo";
+
+    if (!title || !text) {
+      centerPublishMessage.textContent = "Escribe un título y el texto del comunicado.";
+      return;
+    }
+
+    if (!window.confirm(`Se publicará «${title}» en la página del Centro de Estudiantes. ¿Continuar?`)) {
+      return;
+    }
+
+    centerPublishButton.disabled = true;
+    centerPublishButton.textContent = "Publicando…";
+    centerPublishMessage.textContent = "";
+
+    try {
+      await fb.addDoc(fb.collection(db, "publicaciones"), {
+        seccion: "centro",
+        titulo: title,
+        descripcion: text,
+        autor: signature,
+        publicadoEn: fb.serverTimestamp()
+      });
+
+      centerPublishForm.reset();
+      centerPublishMessage.innerHTML =
+        'Comunicado publicado correctamente. <a class="text-link" href="../centro-estudiantes/#comunicados" target="_blank" rel="noopener">Ver en Centro de Estudiantes →</a>';
+
+    } catch (error) {
+      console.error("No fue posible publicar el comunicado:", error);
+      centerPublishMessage.textContent = "No fue posible publicar el comunicado. Revisa la conexión e inténtalo nuevamente.";
+
+    } finally {
+      centerPublishButton.disabled = false;
+      centerPublishButton.textContent = "Publicar comunicado";
+    }
+  });
+
+  /* =====================================================
+     CALENDARIO DE ACTIVIDADES
+  ====================================================== */
+
+  // Fecha local en formato AAAA-MM-DD, igual que se guarda cada actividad.
+  function localToday() {
+    const now = new Date();
+    const pad = value => String(value).padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  }
+
+  function formatActivityDate(value) {
+    const [year, month, day] = value.split("-").map(Number);
+
+    return new Intl.DateTimeFormat("es-CL", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(new Date(year, month - 1, day));
+  }
+
+  function renderCalendarManager(activities) {
+    calendarManagerList.replaceChildren();
+
+    if (!activities.length) {
+      const empty = document.createElement("li");
+      empty.className = "is-empty";
+      empty.textContent = "No hay actividades próximas en el calendario.";
+      calendarManagerList.append(empty);
+      return;
+    }
+
+    for (const activity of activities) {
+      const row = document.createElement("li");
+      const copy = document.createElement("div");
+      const title = document.createElement("strong");
+      const meta = document.createElement("small");
+      const remove = document.createElement("button");
+
+      title.textContent = activity.titulo;
+      meta.textContent = [
+        formatActivityDate(activity.fecha),
+        activity.hora && `${activity.hora} h`,
+        activity.lugar
+      ].filter(Boolean).join(" · ");
+
+      remove.type = "button";
+      remove.className = "calendar-remove";
+      remove.textContent = "Quitar";
+
+      remove.addEventListener("click", async () => {
+        if (!window.confirm(`Se quitará «${activity.titulo}» del calendario. ¿Continuar?`)) return;
+
+        remove.disabled = true;
+
+        try {
+          await fb.updateDoc(fb.doc(db, "publicaciones", activity.id), {
+            oculto: true,
+            ...editorStamp()
+          });
+        } catch (error) {
+          console.error("No fue posible quitar la actividad:", error);
+          remove.disabled = false;
+          window.alert("No fue posible quitar la actividad. Inténtalo nuevamente.");
+        }
+      });
+
+      copy.append(title, meta);
+      row.append(copy, remove);
+      calendarManagerList.append(row);
+    }
+  }
+
+  function subscribeToCalendar() {
+    stopListener("calendar");
+
+    unsubscribeCalendar = fb.onSnapshot(
+      fb.query(fb.collection(db, "publicaciones"), fb.where("seccion", "==", "calendario")),
+      snapshot => {
+        const today = localToday();
+        const activities = snapshot.docs
+          .map(item => ({ id: item.id, ...item.data() }))
+          .filter(item => !item.oculto && typeof item.fecha === "string" && item.fecha >= today)
+          .sort((a, b) => a.fecha.localeCompare(b.fecha) || (a.hora || "").localeCompare(b.hora || ""));
+
+        renderCalendarManager(activities);
+      },
+      error => console.error("Error leyendo el calendario:", error)
+    );
+  }
+
+  calendarPublishForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const title = calendarTitle.value.trim();
+    const date = calendarDate.value;
+
+    if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      calendarPublishMessage.textContent = "Escribe el nombre de la actividad y elige una fecha.";
+      return;
+    }
+
+    if (date < localToday() &&
+        !window.confirm("La fecha elegida ya pasó, así que la actividad quedará en «actividades pasadas». ¿Continuar?")) {
+      return;
+    }
+
+    calendarPublishButton.disabled = true;
+    calendarPublishButton.textContent = "Agregando…";
+    calendarPublishMessage.textContent = "";
+
+    try {
+      await fb.addDoc(fb.collection(db, "publicaciones"), {
+        seccion: "calendario",
+        titulo: title,
+        descripcion: calendarDescription.value.trim(),
+        autor: "Centro de Estudiantes Michelangelo",
+        fecha: date,
+        hora: calendarTime.value,
+        lugar: calendarPlace.value.trim(),
+        publicadoEn: fb.serverTimestamp()
+      });
+
+      calendarPublishForm.reset();
+      calendarPublishMessage.innerHTML =
+        'Actividad agregada. <a class="text-link" href="../centro-estudiantes/#calendario" target="_blank" rel="noopener">Ver el calendario →</a>';
+
+    } catch (error) {
+      console.error("No fue posible agregar la actividad:", error);
+      calendarPublishMessage.textContent = "No fue posible agregar la actividad. Revisa la conexión e inténtalo nuevamente.";
+
+    } finally {
+      calendarPublishButton.disabled = false;
+      calendarPublishButton.textContent = "Agregar actividad";
+    }
+  });
+
   window.addEventListener("beforeunload", event => {
-    if (videoPublishButton.disabled || noteDirty) {
+    if (videoPublishButton.disabled || centerPublishButton.disabled || calendarPublishButton.disabled || noteDirty) {
       event.preventDefault();
     }
   });

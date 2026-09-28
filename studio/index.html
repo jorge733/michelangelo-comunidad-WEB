@@ -243,6 +243,24 @@
           Video en Vida Michelangelo
         </button>
 
+        <button
+          class="nav-item"
+          data-view="centro"
+          type="button"
+        >
+          <span>❖</span>
+          Comunicado del Centro de Estudiantes
+        </button>
+
+        <button
+          class="nav-item"
+          data-view="calendario"
+          type="button"
+        >
+          <span>▦</span>
+          Calendario de actividades
+        </button>
+
       </nav>
 
 
@@ -631,6 +649,165 @@
               <p id="videoPublishMessage" class="video-publish-message" role="status"></p>
 
             </form>
+
+          </section>
+
+        </div>
+
+
+        <!-- =================================================
+             VISTA: COMUNICADO DEL CENTRO DE ESTUDIANTES
+        ================================================== -->
+
+        <div id="centerView" hidden>
+
+          <section class="welcome">
+
+            <div>
+
+              <p class="eyebrow">
+                CENTRO DE ESTUDIANTES
+              </p>
+
+              <h2>
+                Publicar
+                <em>un comunicado.</em>
+              </h2>
+
+            </div>
+
+            <p class="welcome-copy">
+              El comunicado aparece en la página del Centro de
+              Estudiantes solamente al confirmar este formulario.
+            </p>
+
+          </section>
+
+
+          <section class="video-publisher" aria-labelledby="centerPublisherTitle">
+
+            <div>
+              <p class="eyebrow">ANTES DE PUBLICAR</p>
+              <h3 id="centerPublisherTitle">Revisa el comunicado</h3>
+              <ul class="video-checklist">
+                <li>El Centro de Estudiantes aprobó el texto que se publicará.</li>
+                <li>Las fechas, lugares y nombres están correctos.</li>
+                <li>No incluye datos personales de estudiantes.</li>
+              </ul>
+            </div>
+
+            <form id="centerPublishForm" class="video-publish-form">
+
+              <label>
+                Título
+                <input id="centerTitle" required maxlength="120">
+              </label>
+
+              <label>
+                Texto del comunicado
+                <textarea id="centerText" required maxlength="4000" rows="8"></textarea>
+              </label>
+
+              <label>
+                Firma
+                <input id="centerSignature" maxlength="120" value="Centro de Estudiantes Michelangelo">
+              </label>
+
+              <button type="submit" class="button-primary" id="centerPublishButton">Publicar comunicado</button>
+
+              <p id="centerPublishMessage" class="video-publish-message" role="status"></p>
+
+            </form>
+
+          </section>
+
+        </div>
+
+
+        <!-- =================================================
+             VISTA: CALENDARIO DE ACTIVIDADES
+        ================================================== -->
+
+        <div id="calendarView" hidden>
+
+          <section class="welcome">
+
+            <div>
+
+              <p class="eyebrow">
+                CENTRO DE ESTUDIANTES
+              </p>
+
+              <h2>
+                Calendario
+                <em>de actividades.</em>
+              </h2>
+
+            </div>
+
+            <p class="welcome-copy">
+              Las actividades aparecen en la página del Centro de
+              Estudiantes, ordenadas por fecha. Las pasadas se archivan solas.
+            </p>
+
+          </section>
+
+
+          <section class="video-publisher" aria-labelledby="calendarPublisherTitle">
+
+            <div>
+              <p class="eyebrow">NUEVA ACTIVIDAD</p>
+              <h3 id="calendarPublisherTitle">Agregar al calendario</h3>
+              <ul class="video-checklist">
+                <li>La fecha y el lugar están confirmados.</li>
+                <li>El título explica claramente de qué se trata.</li>
+                <li>Si algo cambia, quita la actividad y vuelve a agregarla.</li>
+              </ul>
+            </div>
+
+            <form id="calendarPublishForm" class="video-publish-form">
+
+              <label>
+                Actividad
+                <input id="calendarTitle" required maxlength="120">
+              </label>
+
+              <div class="calendar-form-row">
+                <label>
+                  Fecha
+                  <input id="calendarDate" type="date" required>
+                </label>
+
+                <label>
+                  Hora (opcional)
+                  <input id="calendarTime" type="time">
+                </label>
+              </div>
+
+              <label>
+                Lugar (opcional)
+                <input id="calendarPlace" maxlength="120">
+              </label>
+
+              <label>
+                Descripción (opcional)
+                <textarea id="calendarDescription" maxlength="800"></textarea>
+              </label>
+
+              <button type="submit" class="button-primary" id="calendarPublishButton">Agregar actividad</button>
+
+              <p id="calendarPublishMessage" class="video-publish-message" role="status"></p>
+
+            </form>
+
+          </section>
+
+
+          <section class="calendar-manager" aria-labelledby="calendarManagerTitle">
+
+            <h3 id="calendarManagerTitle">Próximas actividades</h3>
+
+            <ul id="calendarManagerList" class="calendar-manager-list"></ul>
 
           </section>
 

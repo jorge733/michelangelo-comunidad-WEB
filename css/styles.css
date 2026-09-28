@@ -977,6 +977,55 @@ img {
 
 
 /* =========================================================
+   CENTRO DE ESTUDIANTES
+========================================================= */
+
+.center-section {
+  background: var(--paper);
+}
+
+.center-visual {
+  min-height: 460px;
+
+  padding: 40px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 28px;
+
+  text-align: center;
+
+  color: var(--cream-light);
+
+  background: var(--green-dark);
+}
+
+.center-visual strong {
+  font-family: var(--serif);
+  font-size: clamp(5rem, 11vw, 9rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+
+  color: var(--ochre);
+}
+
+.center-visual span {
+  max-width: 280px;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.9;
+  letter-spacing: 0.2em;
+
+  opacity: 0.75;
+}
+
+
+/* =========================================================
    PARTICIPATE
 ========================================================= */
 
@@ -1377,6 +1426,10 @@ img {
     min-height: 390px;
   }
 
+  .center-visual {
+    min-height: 340px;
+  }
+
   .participate {
     padding: 95px 5%;
   }
@@ -1549,6 +1602,10 @@ img {
   .podcast-visual,
   .life-visual {
     min-height: 280px;
+  }
+
+  .center-visual {
+    min-height: 260px;
   }
 
   .microphone {

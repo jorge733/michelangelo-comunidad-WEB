@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centro de Estudiantes | Michelangelo Comunidad</title>
+  <meta name="description" content="Centro de Estudiantes Michelangelo: quiénes somos, qué hacemos y los comunicados para la comunidad.">
+  <link rel="icon" type="image/jpeg" href="../assets/logo-michelangelo.jpg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/publicaciones.css">
+  <link rel="stylesheet" href="centro.css">
+  <meta name="theme-color" content="#faf7f0">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Michelangelo Comunidad">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:title" content="Centro de Estudiantes | Michelangelo Comunidad">
+  <meta property="og:description" content="Centro de Estudiantes Michelangelo: quiénes somos, qué hacemos y los comunicados para la comunidad.">
+  <meta property="og:url" content="https://comunidadmichelangelo.vercel.app/centro-estudiantes/">
+  <meta property="og:image" content="https://comunidadmichelangelo.vercel.app/assets/logo-michelangelo.jpg">
+  <meta name="twitter:card" content="summary">
+  <link rel="apple-touch-icon" href="../assets/logo-michelangelo.jpg">
+  <link rel="stylesheet" href="../css/comun.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="header">
+    <div class="header-container">
+      <a href="../" class="brand" aria-label="Michelangelo Comunidad">
+        <img src="../assets/logo-michelangelo.jpg" alt="Michelangelo Colegio Waldorf" class="brand-logo">
+        <div class="brand-community">
+          <span>COMUNIDAD</span>
+          <small>Un espacio de estudiantes</small>
+        </div>
+      </a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Abrir menú de navegación"
+        aria-controls="mainNav"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav" id="mainNav" aria-label="Navegación principal">
+        <a href="../">Inicio</a>
+        <a href="../periodico/">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <div class="nav-group">
+          <button class="nav-group-toggle active" type="button" aria-expanded="false" aria-controls="navComunidad">Comunidad</button>
+          <div class="nav-submenu" id="navComunidad">
+            <a href="../vida/">Vida Michelangelo</a>
+            <a href="../centro-estudiantes/" class="active" aria-current="page">Centro de Estudiantes</a>
+            <a href="../lineamientos/">Lineamientos</a>
+          </div>
+        </div>
+        <a href="../participa/" class="nav-highlight">Participa</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+
+    <section class="public-hero">
+      <div class="public-hero-inner">
+        <p class="eyebrow">CENTRO DE ESTUDIANTES MICHELANGELO</p>
+        <h1>Nuestra voz, <em>organizada.</em></h1>
+        <p class="public-hero-lead">El Centro de Estudiantes representa a quienes estudiamos en Michelangelo: escucha nuestras inquietudes, impulsa iniciativas y las lleva a la conversación con toda la comunidad.</p>
+        <div class="center-hero-actions">
+          <a href="#calendario" class="button button-primary">Ver calendario</a>
+          <a href="#comunicados" class="button button-secondary">Ver comunicados</a>
+          <a href="../participa/" class="button button-secondary">Enviar una propuesta</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="center-roles" aria-labelledby="centerRolesTitle">
+      <div class="center-container">
+        <p class="section-label">QUÉ HACEMOS</p>
+        <h2 id="centerRolesTitle">Un puente entre estudiantes <em>y comunidad.</em></h2>
+
+        <div class="center-roles-grid">
+          <article class="center-role">
+            <span>01</span>
+            <h3>Representar</h3>
+            <p>Llevamos las opiniones e inquietudes de estudiantes a las instancias de conversación del colegio.</p>
+          </article>
+
+          <article class="center-role">
+            <span>02</span>
+            <h3>Escuchar</h3>
+            <p>Recogemos ideas, propuestas y preocupaciones de todos los cursos, para que ninguna voz quede fuera.</p>
+          </article>
+
+          <article class="center-role">
+            <span>03</span>
+            <h3>Organizar</h3>
+            <p>Impulsamos actividades, celebraciones y proyectos que fortalecen la vida estudiantil.</p>
+          </article>
+
+          <article class="center-role">
+            <span>04</span>
+            <h3>Informar</h3>
+            <p>Compartimos acuerdos, novedades y convocatorias de forma clara y abierta a toda la comunidad.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="center-calendar" id="calendario" aria-labelledby="centerCalendarTitle">
+      <div class="center-container">
+        <p class="section-label">CALENDARIO DE ACTIVIDADES</p>
+        <h2 id="centerCalendarTitle">Lo que viene <em>en Michelangelo.</em></h2>
+
+        <div id="calendar" class="calendar-list" aria-live="polite">
+          <p class="public-state">Cargando actividades…</p>
+        </div>
+
+        <details class="calendar-past" id="calendarPast" hidden>
+          <summary>Ver actividades pasadas</summary>
+          <div id="calendarPastList" class="calendar-list"></div>
+        </details>
+      </div>
+    </section>
+
+    <section class="center-news" id="comunicados" aria-labelledby="centerNewsTitle">
+      <div class="center-container">
+        <p class="section-label">COMUNICADOS</p>
+        <h2 id="centerNewsTitle">Lo último <em>del Centro de Estudiantes.</em></h2>
+
+        <div id="list" class="center-news-list" aria-live="polite">
+          <p class="public-state">Cargando comunicados…</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="participate">
+      <div class="participate-inner">
+        <p class="section-label">TU VOZ TAMBIÉN CUENTA</p>
+        <h2>¿Tienes una idea <em>para el Centro?</em></h2>
+        <p>
+          Propuestas, inquietudes, actividades o mejoras para el colegio:
+          envíalas y el Centro de Estudiantes las revisará.
+        </p>
+        <a href="../participa/" class="button button-light">Enviar una propuesta</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <strong>MICHELANGELO</strong>
+        <span>COMUNIDAD</span>
+      </div>
+
+      <p>
+        Un espacio de participación y creación
+        de estudiantes de Michelangelo.
+      </p>
+
+      <div class="footer-links">
+        <a href="../">Inicio</a>
+        <a href="../periodico/">Periódico</a>
+        <a href="../podcast/">Podcast</a>
+        <a href="../creaciones/">Creaciones</a>
+        <a href="../vida/">Vida Michelangelo</a>
+        <a href="../centro-estudiantes/">Centro de Estudiantes</a>
+        <a href="../participa/">Participa</a>
+        <a href="../lineamientos/">Lineamientos</a>
+        <a href="https://michelangelo.cl/" target="_blank" rel="noopener noreferrer">Sitio oficial Michelangelo</a>
+      </div>
+
+      <div class="footer-bottom">
+        <span>Michelangelo Comunidad</span>
+        <span id="currentYear"></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/app.js"></script>
+  <script type="module">
+    const config={apiKey:"AIzaSyDWSpVS8It00pQXE7I541w-ywTu6mvphIM",authDomain:"michelangelo-comunidad.firebaseapp.com",projectId:"michelangelo-comunidad"};
+    const list=document.querySelector('#list');
+    const [{initializeApp},{getFirestore,collection,query,where,onSnapshot}]=await Promise.all([
+      import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js')
+    ]);
+    const db=getFirestore(initializeApp(config));
+    const dateFormat=new Intl.DateTimeFormat('es-CL',{day:'numeric',month:'long',year:'numeric'});
+    const state=(message,error=false)=>{list.replaceChildren();const node=document.createElement('p');node.className=`public-state${error?' error':''}`;node.textContent=message;list.append(node)};
+    onSnapshot(query(collection(db,'publicaciones'),where('seccion','==','centro')),snapshot=>{
+      const items=snapshot.docs.map(doc=>doc.data());
+      list.replaceChildren();
+      if(!items.length){state('Aún no hay comunicados publicados. Vuelve pronto para conocer las novedades del Centro de Estudiantes.');return}
+      items.sort((a,b)=>(b.publicadoEn?.seconds||0)-(a.publicadoEn?.seconds||0));
+      for(const item of items){
+        const card=document.createElement('article');card.className='center-notice';
+        if(item.publicadoEn){const date=document.createElement('time');const when=item.publicadoEn.toDate();date.dateTime=when.toISOString();date.textContent=dateFormat.format(when);card.append(date)}
+        const title=document.createElement('h3');title.textContent=item.titulo||'Comunicado';
+        const body=document.createElement('p');body.textContent=item.descripcion||'';
+        const author=document.createElement('small');author.textContent=item.autor||'Centro de Estudiantes Michelangelo';
+        card.append(title,body,author);list.append(card);
+      }
+    },()=>state('No fue posible cargar los comunicados. Inténtalo nuevamente en unos minutos.',true));
+
+    // Calendario: cada actividad guarda su fecha como AAAA-MM-DD y se interpreta
+    // en la hora local, para que no cambie de día según la zona horaria.
+    const calendar=document.querySelector('#calendar');
+    const past=document.querySelector('#calendarPast');
+    const pastList=document.querySelector('#calendarPastList');
+    const monthFormat=new Intl.DateTimeFormat('es-CL',{month:'long',year:'numeric'});
+    const weekdayFormat=new Intl.DateTimeFormat('es-CL',{weekday:'short'});
+    const toDate=value=>{const [y,m,d]=value.split('-').map(Number);return new Date(y,m-1,d)};
+    const pad=n=>String(n).padStart(2,'0');
+    const now=new Date();const today=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+    const calendarState=(message,error=false)=>{calendar.replaceChildren();const node=document.createElement('p');node.className=`public-state${error?' error':''}`;node.textContent=message;calendar.append(node)};
+    const renderEvents=(target,items)=>{
+      target.replaceChildren();let month='';
+      for(const item of items){
+        const date=toDate(item.fecha);const label=monthFormat.format(date);
+        if(label!==month){month=label;const heading=document.createElement('h3');heading.className='calendar-month';heading.textContent=label;target.append(heading)}
+        const event=document.createElement('article');event.className='calendar-event';
+        const day=document.createElement('time');day.className='calendar-day';day.dateTime=item.fecha;
+        const weekday=document.createElement('small');weekday.textContent=weekdayFormat.format(date).replace('.','');
+        const number=document.createElement('strong');number.textContent=date.getDate();
+        day.append(weekday,number);
+        const copy=document.createElement('div');copy.className='calendar-copy';
+        const title=document.createElement('h4');title.textContent=item.titulo||'Actividad';copy.append(title);
+        const meta=[item.hora&&`${item.hora} h`,item.lugar].filter(Boolean).join(' · ');
+        if(meta){const node=document.createElement('p');node.className='calendar-meta';node.textContent=meta;copy.append(node)}
+        if(item.descripcion){const node=document.createElement('p');node.textContent=item.descripcion;copy.append(node)}
+        event.append(day,copy);target.append(event);
+      }
+    };
+    onSnapshot(query(collection(db,'publicaciones'),where('seccion','==','calendario')),snapshot=>{
+      const items=snapshot.docs.map(doc=>doc.data()).filter(item=>!item.oculto&&/^\d{4}-\d{2}-\d{2}$/.test(item.fecha||''));
+      const byDate=(a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora||'').localeCompare(b.hora||'');
+      const upcoming=items.filter(item=>item.fecha>=today).sort(byDate);
+      const done=items.filter(item=>item.fecha<today).sort((a,b)=>byDate(b,a)).slice(0,12);
+      if(upcoming.length)renderEvents(calendar,upcoming);
+      else calendarState('No hay actividades próximas en el calendario. Vuelve pronto para conocer lo que viene.');
+      past.hidden=!done.length;
+      renderEvents(pastList,done);
+    },()=>calendarState('No fue posible cargar el calendario. Inténtalo nuevamente en unos minutos.',true));
+  </script>
+</body>
+</html>
