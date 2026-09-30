@@ -10,10 +10,46 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/editores/$(request.auth.uid));
     }
 
-    // Lista de editores: solo se administra desde la consola de Firebase.
+    // Rol de la cuenta en Studio. Las cuentas registradas antes de que
+    // existieran los roles no tienen el campo y conservan acceso completo.
+    function editorRole() {
+      return get(/databases/$(database)/documents/editores/$(request.auth.uid)).data.get('rol', 'admin');
+    }
+
+    // Administración siempre tiene acceso, además de los roles indicados.
+    function hasRole(roles) {
+      return isEditor() && editorRole() in roles.concat(['admin']);
+    }
+
+    // Qué rol puede publicar o modificar cada sección pública.
+    function canPublishIn(seccion) {
+      return (seccion == 'creaciones' && hasRole(['editorial']))
+        || (seccion == 'vida' && hasRole(['audiovisual']))
+        || (seccion in ['centro', 'calendario'] && hasRole(['centro']));
+    }
+
+    function validMember(data) {
+      return data.keys().hasOnly(['rol', 'correo', 'actualizadoEn', 'actualizadoPor'])
+        && data.rol in ['admin', 'editorial', 'centro', 'audiovisual']
+        && data.get('correo', '') is string
+        && data.get('correo', '').size() <= 200
+        && data.get('actualizadoPor', '') is string
+        && data.get('actualizadoEn', request.time) == request.time;
+    }
+
+    // Equipo de Studio. Las cuentas se crean en Firebase Authentication y
+    // Administración decide aquí quién entra y con qué rol. Nadie puede
+    // cambiar su propio rol ni quitarse el acceso, así siempre queda al
+    // menos una cuenta de Administración.
     match /editores/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
+      allow read: if (request.auth != null && request.auth.uid == uid) || hasRole([]);
+      allow create: if hasRole([]) && validMember(request.resource.data);
+      allow update: if (hasRole([]) && request.auth.uid != uid && validMember(request.resource.data))
+        // Cada cuenta mantiene su correo al día para que el equipo la reconozca.
+        || (isEditor() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['correo'])
+          && request.resource.data.correo == request.auth.token.email);
+      allow delete: if hasRole([]) && request.auth.uid != uid;
     }
 
     // Bandeja privada: el público solo puede crear aportes; Studio autenticado
@@ -41,11 +77,11 @@ service cloud.firestore {
         && request.resource.data.quiereParticipar is bool
         && request.resource.data.creadoEn == request.time;
 
-      allow read: if isEditor();
+      allow read: if hasRole(['editorial']);
       // Studio solo puede cambiar el estado editorial y su nota interna; el
       // aporte conserva siempre su información original y su preferencia de
       // anonimato.
-      allow update: if isEditor()
+      allow update: if hasRole(['editorial'])
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['estado', 'notaEditorial', 'actualizadoEn', 'actualizadoPor'])
         && request.resource.data.estado in ['pendiente', 'revision', 'aprobado', 'rechazado']
@@ -60,7 +96,7 @@ service cloud.firestore {
     // publicaciones ya aprobadas, puede leerse desde las páginas públicas.
     match /publicaciones/{publicacionId} {
       allow read: if true;
-      allow create: if isEditor()
+      allow create: if canPublishIn(request.resource.data.seccion)
         && request.resource.data.keys().hasOnly([
           'seccion', 'aporteId', 'titulo', 'descripcion', 'autor', 'archivo',
           'imagenUrl', 'videoUrl', 'publicadoEn', 'fecha', 'hora', 'lugar'
@@ -74,7 +110,8 @@ service cloud.firestore {
         && request.resource.data.descripcion is string
         && request.resource.data.autor is string
         && request.resource.data.publicadoEn is timestamp;
-      allow update: if isEditor();
+      allow update: if canPublishIn(resource.data.seccion)
+        && request.resource.data.seccion == resource.data.seccion;
       allow delete: if false;
     }
 

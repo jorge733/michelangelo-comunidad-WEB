@@ -10,8 +10,15 @@ service firebase.storage {
         && firestore.exists(/databases/(default)/documents/editores/$(request.auth.uid));
     }
 
+    // Igual que en firestore.rules: sin campo «rol» la cuenta es Administración,
+    // y Administración tiene acceso a todo.
+    function hasRole(role) {
+      return isEditor()
+        && firestore.get(/databases/(default)/documents/editores/$(request.auth.uid)).data.get('rol', 'admin') in [role, 'admin'];
+    }
+
     // Las fotos de aportes públicos nunca se leen desde el sitio público.
-    // Studio autenticado las revisa antes de cualquier publicación editorial.
+    // El equipo editorial las revisa antes de cualquier publicación.
     match /aportes/{aporteId}/fotografias/{fileName} {
       // La página crea una sesión anónima de Firebase antes de cargar. Así
       // estudiantes no necesitan registro, pero Storage no acepta escrituras
@@ -19,16 +26,16 @@ service firebase.storage {
       allow create: if request.auth != null
         && request.resource.size <= 10 * 1024 * 1024
         && request.resource.contentType.matches('image/(jpeg|png|webp)');
-      allow read: if isEditor();
+      allow read: if hasRole('editorial');
       allow delete: if false;
     }
 
-    // Los videos solo podrán subirse y revisarse desde Studio autenticado.
+    // Los videos solo los sube y revisa el equipo audiovisual desde Studio.
     match /publicaciones/{publicacionId}/videos/{fileName} {
-      allow create, update: if isEditor()
+      allow create, update: if hasRole('audiovisual')
         && request.resource.size <= 250 * 1024 * 1024
         && request.resource.contentType.matches('video/(mp4|webm)');
-      allow read: if isEditor();
+      allow read: if hasRole('audiovisual');
       allow delete: if false;
     }
 

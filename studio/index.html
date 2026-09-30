@@ -180,7 +180,7 @@
 
       <nav class="sidebar-nav" aria-label="Secciones de Studio">
 
-        <p class="sidebar-label">BANDEJA</p>
+        <p class="sidebar-label" data-nav-group="bandeja">BANDEJA</p>
 
         <button
           class="nav-item active"
@@ -232,7 +232,7 @@
           <em class="nav-count" data-pending-count="idea"></em>
         </button>
 
-        <p class="sidebar-label">PUBLICAR</p>
+        <p class="sidebar-label" data-nav-group="publicar">PUBLICAR</p>
 
         <button
           class="nav-item"
@@ -261,6 +261,17 @@
           Calendario de actividades
         </button>
 
+        <p class="sidebar-label" data-nav-group="administrar">ADMINISTRAR</p>
+
+        <button
+          class="nav-item"
+          data-view="equipo"
+          type="button"
+        >
+          <span>☰</span>
+          Equipo y roles
+        </button>
+
       </nav>
 
 
@@ -275,6 +286,7 @@
             <small id="sidebarUser">
               Sesión iniciada
             </small>
+            <small class="sidebar-role" id="sidebarRole"></small>
           </div>
 
         </div>
@@ -808,6 +820,86 @@
             <h3 id="calendarManagerTitle">Próximas actividades</h3>
 
             <ul id="calendarManagerList" class="calendar-manager-list"></ul>
+
+          </section>
+
+        </div>
+
+
+        <!-- =================================================
+             VISTA: EQUIPO Y ROLES
+        ================================================== -->
+
+        <div id="teamView" hidden>
+
+          <section class="welcome">
+
+            <div>
+
+              <p class="eyebrow">
+                ADMINISTRACIÓN
+              </p>
+
+              <h2>
+                Equipo
+                <em>y roles.</em>
+              </h2>
+
+            </div>
+
+            <p class="welcome-copy">
+              Cada cuenta ve en Studio solo las secciones de su rol.
+              Los cambios se aplican de inmediato, incluso con la sesión abierta.
+            </p>
+
+          </section>
+
+
+          <section class="video-publisher" aria-labelledby="teamAddTitle">
+
+            <div>
+              <p class="eyebrow">NUEVA CUENTA</p>
+              <h3 id="teamAddTitle">Dar acceso a Studio</h3>
+              <ul class="video-checklist">
+                <li>Crea la cuenta con correo y contraseña en Firebase Console → Authentication.</li>
+                <li>Copia el «UID de usuario» que aparece junto al correo.</li>
+                <li>Pégalo aquí y elige su rol.</li>
+              </ul>
+            </div>
+
+            <form id="teamAddForm" class="video-publish-form">
+
+              <label>
+                UID de usuario
+                <input id="teamUid" required maxlength="128" autocomplete="off" spellcheck="false">
+              </label>
+
+              <label>
+                Correo
+                <input id="teamEmail" type="email" required maxlength="200" autocomplete="off">
+              </label>
+
+              <label>
+                Rol
+                <select id="teamRole" class="team-role-select" required></select>
+              </label>
+
+              <button type="submit" class="button-primary" id="teamAddButton">Dar acceso</button>
+
+              <p id="teamAddMessage" class="video-publish-message" role="status"></p>
+
+            </form>
+
+          </section>
+
+
+          <section class="calendar-manager" aria-labelledby="teamListTitle">
+
+            <h3 id="teamListTitle">Cuentas con acceso</h3>
+
+            <dl class="team-roles-help" id="teamRolesHelp"></dl>
+
+            <ul id="teamList" class="calendar-manager-list team-list"></ul>
 
           </section>
 

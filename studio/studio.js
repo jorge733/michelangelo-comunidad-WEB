@@ -43,6 +43,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       where: firestoreModule.where,
       doc: firestoreModule.doc,
       updateDoc: firestoreModule.updateDoc,
+      setDoc: firestoreModule.setDoc,
+      deleteDoc: firestoreModule.deleteDoc,
       serverTimestamp: firestoreModule.serverTimestamp,
       storageRef: storageModule.ref,
       getDownloadURL: storageModule.getDownloadURL,
@@ -82,6 +84,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   let unsubscribeSubmissions = null;
   let unsubscribePublications = null;
   let unsubscribeCalendar = null;
+  let unsubscribeTeam = null;
+  let unsubscribeRole = null;
+
+  let currentRole = null;
+  let currentView = "inbox";
+  let teamMembers = [];
 
 
   /* =====================================================
@@ -100,6 +108,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     revision: { label: "EN REVISIÓN", plural: "En revisión" },
     aprobado: { label: "APROBADO", plural: "Aprobados" },
     rechazado: { label: "RECHAZADO", plural: "Rechazados" }
+  };
+
+  // Vistas de Studio que ve cada rol. Deben coincidir con firestore.rules
+  // y storage.rules, que son las que realmente protegen los datos.
+  const roleInfo = {
+    admin: {
+      label: "Administración",
+      help: "Todo Studio, y además administra el equipo y sus roles.",
+      views: ["inbox", "video", "centro", "calendario", "equipo"]
+    },
+    editorial: {
+      label: "Equipo editorial",
+      help: "Revisa los aportes de Participa y publica en Creaciones.",
+      views: ["inbox"]
+    },
+    centro: {
+      label: "Centro de Estudiantes",
+      help: "Publica comunicados y administra el calendario de actividades.",
+      views: ["centro", "calendario"]
+    },
+    audiovisual: {
+      label: "Audiovisual",
+      help: "Publica videos en Vida Michelangelo.",
+      views: ["video"]
+    }
   };
 
   // Etiquetas legibles para los campos de "detalles". Incluye los nombres
@@ -150,6 +183,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const loginButton = $("loginButton");
   const logoutButton = $("logoutButton");
   const sidebarUser = $("sidebarUser");
+  const sidebarRole = $("sidebarRole");
+  const navGroupLabels = document.querySelectorAll("[data-nav-group]");
   const editorAvatar = $("editorAvatar");
 
   const inboxView = $("inboxView");
@@ -233,6 +268,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const calendarPublishButton = $("calendarPublishButton");
   const calendarPublishMessage = $("calendarPublishMessage");
   const calendarManagerList = $("calendarManagerList");
+
+  const teamView = $("teamView");
+  const teamAddForm = $("teamAddForm");
+  const teamUid = $("teamUid");
+  const teamEmail = $("teamEmail");
+  const teamRole = $("teamRole");
+  const teamAddButton = $("teamAddButton");
+  const teamAddMessage = $("teamAddMessage");
+  const teamList = $("teamList");
+  const teamRolesHelp = $("teamRolesHelp");
 
 
   /* =====================================================
@@ -438,15 +483,97 @@ document.addEventListener("DOMContentLoaded", async () => {
   fb.onAuthStateChanged(auth, user => {
     // Las sesiones anónimas del formulario público no dan acceso a Studio.
     if (user && !user.isAnonymous) {
-      showStudio(user);
-      subscribeToSubmissions();
-      subscribeToPublications();
-      subscribeToCalendar();
+      subscribeToOwnRole(user);
     } else {
       showLogin();
       stopListeners();
     }
   });
+
+  function denyAccess(message) {
+    showLoginError(message);
+    fb.signOut(auth).catch(error => console.error("No fue posible cerrar sesión:", error));
+  }
+
+  // Escucha el documento de la propia cuenta en /editores, así un cambio de
+  // rol hecho por Administración se aplica sin volver a iniciar sesión.
+  function subscribeToOwnRole(user) {
+    stopListener("role");
+
+    unsubscribeRole = fb.onSnapshot(
+      fb.doc(db, "editores", user.uid),
+      snapshot => {
+        if (!snapshot.exists()) {
+          denyAccess("Tu cuenta no tiene acceso a Studio. Pide a Administración que te lo dé.");
+          return;
+        }
+
+        const data = snapshot.data();
+        // Igual que las reglas: sin campo «rol» la cuenta es Administración.
+        const role = data.rol === undefined ? "admin" : data.rol;
+
+        if (!roleInfo[role]) {
+          denyAccess("Tu cuenta no tiene un rol válido en Studio. Pide a Administración que lo revise.");
+          return;
+        }
+
+        if (user.email && data.correo !== user.email) {
+          fb.updateDoc(snapshot.ref, { correo: user.email })
+            .catch(error => console.error("No fue posible registrar el correo:", error));
+        }
+
+        applyRole(role, user);
+      },
+      error => {
+        console.error("Error leyendo el rol:", error);
+        denyAccess("No fue posible comprobar tu acceso a Studio. Inténtalo nuevamente.");
+      }
+    );
+  }
+
+  function can(view) {
+    return Boolean(currentRole && roleInfo[currentRole].views.includes(view));
+  }
+
+  function applyRole(role, user) {
+    if (role === currentRole) return;
+
+    currentRole = role;
+    showStudio(user);
+
+    navItems.forEach(button => {
+      button.hidden = !can(button.dataset.view || "inbox");
+    });
+
+    navGroupLabels.forEach(label => {
+      const group = label.dataset.navGroup;
+      label.hidden = group === "bandeja" ? !can("inbox")
+        : group === "publicar" ? !["video", "centro", "calendario"].some(can)
+        : !can("equipo");
+    });
+
+    if (can("inbox")) {
+      subscribeToSubmissions();
+      subscribeToPublications();
+    } else {
+      stopListener("submissions");
+      stopListener("publications");
+      submissions = [];
+
+      if (modalOverlay.classList.contains("active")) {
+        noteDirty = false;
+        closeModal();
+      }
+    }
+
+    if (can("calendario")) subscribeToCalendar();
+    else stopListener("calendar");
+
+    if (can("equipo")) subscribeToTeam();
+    else stopListener("team");
+
+    showView(can(currentView) ? currentView : roleInfo[role].views[0]);
+  }
 
   function showStudio(user) {
     loginScreen.hidden = true;
@@ -455,8 +582,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = user.email || "Usuario autorizado";
 
     sidebarUser.textContent = email;
+    sidebarRole.textContent = roleInfo[currentRole]?.label || "";
     editorAvatar.textContent = email.charAt(0).toUpperCase() || "M";
-    editorAvatar.title = email;
+    editorAvatar.title = `${email} · ${roleInfo[currentRole]?.label || ""}`;
 
     clearLoginError();
   }
@@ -465,7 +593,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     studioShell.hidden = true;
     loginScreen.hidden = false;
 
+    currentRole = null;
+    currentView = "inbox";
     submissions = [];
+    teamMembers = [];
     publishedCreations = new Set();
 
     if (modalOverlay.classList.contains("active")) {
@@ -548,12 +679,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       unsubscribeCalendar();
       unsubscribeCalendar = null;
     }
+
+    if (name === "team" && typeof unsubscribeTeam === "function") {
+      unsubscribeTeam();
+      unsubscribeTeam = null;
+    }
+
+    if (name === "role" && typeof unsubscribeRole === "function") {
+      unsubscribeRole();
+      unsubscribeRole = null;
+    }
   }
 
   function stopListeners() {
     stopListener("submissions");
     stopListener("publications");
     stopListener("calendar");
+    stopListener("team");
+    stopListener("role");
   }
 
   function editorStamp() {
@@ -721,10 +864,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showView(view) {
+    if (!can(view)) return;
+
+    currentView = view;
     inboxView.hidden = view !== "inbox";
     videoView.hidden = view !== "video";
     centerView.hidden = view !== "centro";
     calendarView.hidden = view !== "calendario";
+    teamView.hidden = view !== "equipo";
 
     navItems.forEach(button => {
       const active = view === "inbox"
@@ -1469,6 +1616,192 @@ document.addEventListener("DOMContentLoaded", async () => {
     } finally {
       calendarPublishButton.disabled = false;
       calendarPublishButton.textContent = "Agregar actividad";
+    }
+  });
+
+  /* =====================================================
+     EQUIPO Y ROLES
+  ====================================================== */
+
+  const roleOptions = Object.entries(roleInfo)
+    .map(([value, info]) => `<option value="${value}">${escapeHTML(info.label)}</option>`)
+    .join("");
+
+  teamRole.innerHTML = roleOptions;
+  teamRole.value = "editorial";
+
+  teamRolesHelp.innerHTML = Object.values(roleInfo)
+    .map(info => `<div><dt>${escapeHTML(info.label)}</dt><dd>${escapeHTML(info.help)}</dd></div>`)
+    .join("");
+
+  // Guarda la cuenta completa: así también se limpian campos antiguos que
+  // las reglas ya no aceptan en /editores.
+  function saveMember(uid, role, email) {
+    return fb.setDoc(fb.doc(db, "editores", uid), {
+      rol: role,
+      correo: email,
+      ...editorStamp()
+    });
+  }
+
+  function renderTeam() {
+    teamList.replaceChildren();
+
+    if (!teamMembers.length) {
+      const empty = document.createElement("li");
+      empty.className = "is-empty";
+      empty.textContent = "Todavía no hay cuentas registradas.";
+      teamList.append(empty);
+      return;
+    }
+
+    for (const member of teamMembers) {
+      const isSelf = member.uid === auth.currentUser?.uid;
+      const row = document.createElement("li");
+      const copy = document.createElement("div");
+      const title = document.createElement("strong");
+      const meta = document.createElement("small");
+      const actions = document.createElement("div");
+      const select = document.createElement("select");
+
+      title.textContent = member.correo || "Correo aún no registrado";
+      meta.textContent = [
+        `UID ${member.uid}`,
+        member.actualizadoPor && `último cambio por ${member.actualizadoPor}`
+      ].filter(Boolean).join(" · ");
+
+      select.className = "team-role-select";
+      select.innerHTML = roleOptions;
+      select.value = member.rol;
+      select.disabled = isSelf;
+      select.setAttribute("aria-label", `Rol de ${member.correo || member.uid}`);
+
+      select.addEventListener("change", async () => {
+        const label = roleInfo[select.value].label;
+
+        if (!window.confirm(`${member.correo || member.uid} pasará a tener el rol «${label}». ¿Continuar?`)) {
+          select.value = member.rol;
+          return;
+        }
+
+        select.disabled = true;
+
+        try {
+          await saveMember(member.uid, select.value, member.correo);
+        } catch (error) {
+          console.error("No fue posible cambiar el rol:", error);
+          select.value = member.rol;
+          window.alert("No fue posible cambiar el rol. Inténtalo nuevamente.");
+        } finally {
+          select.disabled = false;
+        }
+      });
+
+      actions.className = "team-actions";
+      actions.append(select);
+
+      if (isSelf) {
+        const self = document.createElement("span");
+        self.className = "team-self";
+        self.textContent = "Tu cuenta";
+        actions.append(self);
+      } else {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "calendar-remove";
+        remove.textContent = "Quitar acceso";
+
+        remove.addEventListener("click", async () => {
+          if (!window.confirm(`${member.correo || member.uid} ya no podrá entrar a Studio. La cuenta seguirá existiendo en Firebase. ¿Continuar?`)) return;
+
+          remove.disabled = true;
+
+          try {
+            await fb.deleteDoc(fb.doc(db, "editores", member.uid));
+          } catch (error) {
+            console.error("No fue posible quitar el acceso:", error);
+            remove.disabled = false;
+            window.alert("No fue posible quitar el acceso. Inténtalo nuevamente.");
+          }
+        });
+
+        actions.append(remove);
+      }
+
+      copy.append(title, meta);
+      row.append(copy, actions);
+      teamList.append(row);
+    }
+  }
+
+  function subscribeToTeam() {
+    stopListener("team");
+
+    unsubscribeTeam = fb.onSnapshot(
+      fb.collection(db, "editores"),
+      snapshot => {
+        const order = Object.keys(roleInfo);
+
+        teamMembers = snapshot.docs
+          .map(item => {
+            const data = item.data();
+            return {
+              uid: item.id,
+              rol: data.rol === undefined ? "admin" : data.rol,
+              correo: data.correo || "",
+              actualizadoPor: data.actualizadoPor || ""
+            };
+          })
+          .filter(member => roleInfo[member.rol])
+          .sort((a, b) =>
+            order.indexOf(a.rol) - order.indexOf(b.rol) || a.correo.localeCompare(b.correo)
+          );
+
+        renderTeam();
+      },
+      error => console.error("Error leyendo el equipo:", error)
+    );
+  }
+
+  teamAddForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const uid = teamUid.value.trim();
+    const email = teamEmail.value.trim();
+    const role = teamRole.value;
+
+    if (!/^[A-Za-z0-9_-]{10,128}$/.test(uid)) {
+      teamAddMessage.textContent = "El UID no parece válido. Cópialo tal cual desde Firebase Console → Authentication.";
+      return;
+    }
+
+    if (!email || !roleInfo[role]) {
+      teamAddMessage.textContent = "Escribe el correo de la cuenta y elige un rol.";
+      return;
+    }
+
+    if (teamMembers.some(member => member.uid === uid)) {
+      teamAddMessage.textContent = "Esa cuenta ya tiene acceso. Cambia su rol desde la lista.";
+      return;
+    }
+
+    teamAddButton.disabled = true;
+    teamAddButton.textContent = "Guardando…";
+    teamAddMessage.textContent = "";
+
+    try {
+      await saveMember(uid, role, email);
+      teamAddForm.reset();
+      teamRole.value = "editorial";
+      teamAddMessage.textContent = `Listo: ${email} ya puede entrar a Studio como «${roleInfo[role].label}».`;
+
+    } catch (error) {
+      console.error("No fue posible dar acceso:", error);
+      teamAddMessage.textContent = "No fue posible dar acceso. Revisa la conexión e inténtalo nuevamente.";
+
+    } finally {
+      teamAddButton.disabled = false;
+      teamAddButton.textContent = "Dar acceso";
     }
   });
 
