@@ -22,6 +22,7 @@
   margin: auto;
 }
 
+.center-team,
 .center-roles,
 .center-calendar,
 .center-news {
@@ -32,6 +33,7 @@
   background: var(--paper);
 }
 
+.center-team h2,
 .center-roles h2,
 .center-calendar h2,
 .center-news h2 {
@@ -46,10 +48,63 @@
   color: var(--ink);
 }
 
+.center-team h2 em,
 .center-roles h2 em,
 .center-calendar h2 em,
 .center-news h2 em {
   color: var(--terracotta);
+}
+
+
+/* =========================================================
+   QUIÉNES SOMOS
+========================================================= */
+
+.center-team {
+  background: var(--cream);
+}
+
+.center-team-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: start;
+
+  gap: 64px;
+}
+
+.center-team-lead {
+  margin-top: 24px;
+  max-width: 560px;
+
+  font-size: 1.08rem;
+  line-height: 1.7;
+
+  color: var(--ink-soft);
+}
+
+.center-team-list {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  column-gap: 28px;
+
+  border-top: 1px solid var(--border);
+}
+
+.center-team-list li {
+  padding: 14px 0;
+
+  font-family: var(--serif);
+  font-size: 1.2rem;
+
+  color: var(--ink);
+
+  border-bottom: 1px solid var(--border);
 }
 
 
@@ -305,6 +360,12 @@
 ========================================================= */
 
 @media (max-width: 950px) {
+  .center-team-layout {
+    grid-template-columns: 1fr;
+
+    gap: 40px;
+  }
+
   .center-roles-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -321,6 +382,7 @@
 }
 
 @media (max-width: 650px) {
+  .center-team,
   .center-roles,
   .center-calendar,
   .center-news {
