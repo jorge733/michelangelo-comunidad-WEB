@@ -162,12 +162,10 @@ document.addEventListener("DOMContentLoaded", () => {
         </p>
 
         <ul class="welcome-list">
-          <li><span aria-hidden="true">📰</span><div><strong>Periódico</strong>Noticias, entrevistas y opiniones de la comunidad escolar.</div></li>
+          <li><span aria-hidden="true">📰</span><div><strong>Periódico</strong>Noticias, entrevistas, opiniones y creaciones de la comunidad escolar: arte, fotografía, literatura y música. Cualquier estudiante puede participar enviando un artículo, una creación o una idea.</div></li>
           <li><span aria-hidden="true">🎙️</span><div><strong>Podcast</strong>Conversaciones sobre lo que nos interesa, hechas por estudiantes.</div></li>
-          <li><span aria-hidden="true">🎨</span><div><strong>Creaciones</strong>Arte, fotografía, literatura y música de estudiantes.</div></li>
-          <li><span aria-hidden="true">🌱</span><div><strong>Comunidad</strong>Vida Michelangelo y el Centro de Estudiantes, con su calendario de actividades.</div></li>
-          <li><span aria-hidden="true">🤝</span><div><strong>Organización Estudiantil</strong>El Centro de Estudiantes recién está naciendo: para partir, somos una Organización Estudiantil que escucha, propone y organiza.</div></li>
-          <li><span aria-hidden="true">💡</span><div><strong>Participa</strong>Cualquier estudiante puede enviar un artículo, una creación o una idea.</div></li>
+          <li><span aria-hidden="true">🌱</span><div><strong>Comunidad</strong>Vida Michelangelo y los lineamientos para participar y publicar.</div></li>
+          <li><span aria-hidden="true">🤝</span><div><strong>Organización Estudiantil</strong>El Centro de Estudiantes recién está naciendo: para partir, somos una Organización Estudiantil que escucha, propone y organiza, con su calendario de actividades.</div></li>
         </ul>
 
         <div class="welcome-actions">

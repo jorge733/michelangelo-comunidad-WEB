@@ -23,8 +23,7 @@ service cloud.firestore {
 
     // Qué rol puede publicar o modificar cada sección pública.
     function canPublishIn(seccion) {
-      return (seccion == 'creaciones' && hasRole(['editorial']))
-        || (seccion == 'vida' && hasRole(['audiovisual']))
+      return (seccion == 'vida' && hasRole(['audiovisual']))
         || (seccion in ['centro', 'calendario'] && hasRole(['centro']));
     }
 
@@ -101,7 +100,7 @@ service cloud.firestore {
           'seccion', 'aporteId', 'titulo', 'descripcion', 'autor', 'archivo',
           'imagenUrl', 'videoUrl', 'publicadoEn', 'fecha', 'hora', 'lugar'
         ])
-        && request.resource.data.seccion in ['creaciones', 'vida', 'centro', 'calendario']
+        && request.resource.data.seccion in ['vida', 'centro', 'calendario']
         // Las actividades del calendario guardan su día como AAAA-MM-DD.
         && (request.resource.data.seccion != 'calendario'
           || (request.resource.data.get('fecha', '') is string

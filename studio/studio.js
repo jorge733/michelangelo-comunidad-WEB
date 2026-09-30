@@ -72,7 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let submissions = [];
   let visibleSubmissions = [];
-  let publishedCreations = new Set();
 
   let currentFilter = "todos";
   let currentStatus = "todos";
@@ -82,7 +81,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let lastFocusedElement = null;
 
   let unsubscribeSubmissions = null;
-  let unsubscribePublications = null;
   let unsubscribeCalendar = null;
   let unsubscribeTeam = null;
   let unsubscribeRole = null;
@@ -120,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     editorial: {
       label: "Equipo editorial",
-      help: "Revisa los aportes de Participa y publica en Creaciones.",
+      help: "Revisa los aportes de Participa, incluidas las creaciones para el Periódico.",
       views: ["inbox"]
     },
     centro: {
@@ -234,7 +232,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const modalAttachments = $("modalAttachments");
   const statusButtons = document.querySelectorAll(".status-actions button");
   const statusHelp = $("statusHelp");
-  const publishCreationButton = $("publishCreationButton");
   const editorialNote = $("editorialNote");
   const noteHelp = $("noteHelp");
   const saveNoteButton = $("saveNoteButton");
@@ -554,10 +551,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (can("inbox")) {
       subscribeToSubmissions();
-      subscribeToPublications();
     } else {
       stopListener("submissions");
-      stopListener("publications");
       submissions = [];
 
       if (modalOverlay.classList.contains("active")) {
@@ -597,7 +592,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentView = "inbox";
     submissions = [];
     teamMembers = [];
-    publishedCreations = new Set();
 
     if (modalOverlay.classList.contains("active")) {
       noteDirty = false;
@@ -646,33 +640,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   }
 
-  // Las publicaciones son públicas; las escuchamos para saber qué
-  // creaciones ya están en la sección Creaciones.
-  function subscribeToPublications() {
-    stopListener("publications");
-
-    unsubscribePublications = fb.onSnapshot(
-      fb.query(fb.collection(db, "publicaciones"), fb.where("seccion", "==", "creaciones")),
-      snapshot => {
-        publishedCreations = new Set(snapshot.docs.map(item => item.data().aporteId).filter(Boolean));
-        renderSubmissions();
-
-        const current = submissions.find(item => item.id === currentSubmissionId);
-        if (current) updatePublishButton(current);
-      },
-      error => console.error("Error leyendo publicaciones:", error)
-    );
-  }
-
   function stopListener(name) {
     if (name === "submissions" && typeof unsubscribeSubmissions === "function") {
       unsubscribeSubmissions();
       unsubscribeSubmissions = null;
-    }
-
-    if (name === "publications" && typeof unsubscribePublications === "function") {
-      unsubscribePublications();
-      unsubscribePublications = null;
     }
 
     if (name === "calendar" && typeof unsubscribeCalendar === "function") {
@@ -693,7 +664,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function stopListeners() {
     stopListener("submissions");
-    stopListener("publications");
     stopListener("calendar");
     stopListener("team");
     stopListener("role");
@@ -799,7 +769,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (item.draft) chips.push("Incluye texto");
       if (item.contact) chips.push("Con correo");
       if (item.note) chips.push("Con nota");
-      if (publishedCreations.has(item.id)) chips.push("Publicada");
 
       article.className = `submission-card${item.status === "pendiente" ? " is-pending" : ""}`;
       article.dataset.id = item.id;
@@ -1060,7 +1029,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       button.setAttribute("aria-pressed", button.dataset.status === item.status ? "true" : "false");
     });
 
-    updatePublishButton(item);
     updateModalNavigation();
 
     // Estos elementos solo se reconstruyen al cambiar de aporte, para que
@@ -1117,15 +1085,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           link.textContent = "No fue posible abrir la foto.";
         });
     });
-  }
-
-  function updatePublishButton(item) {
-    const canPublish = item.type === "creacion" && item.status === "aprobado";
-    const published = publishedCreations.has(item.id);
-
-    publishCreationButton.hidden = !canPublish && !published;
-    publishCreationButton.disabled = published;
-    publishCreationButton.textContent = published ? "✓ Publicada en Creaciones" : "Publicar en Creaciones";
   }
 
   function updateModalNavigation() {
@@ -1291,57 +1250,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     } finally {
       saveNoteButton.disabled = false;
-    }
-  });
-
-
-  /* =====================================================
-     PUBLICAR CREACIÓN
-  ====================================================== */
-
-  publishCreationButton.addEventListener("click", async () => {
-    const item = submissions.find(submission => submission.id === currentSubmissionId);
-
-    if (!item || item.type !== "creacion" || item.status !== "aprobado" || publishedCreations.has(item.id)) {
-      return;
-    }
-
-    const author = item.anonymous ? "Anónimo" : item.realName;
-
-    if (!window.confirm(`Se publicará «${item.title}» en Creaciones con autoría «${author}». ¿Continuar?`)) {
-      return;
-    }
-
-    publishCreationButton.disabled = true;
-    publishCreationButton.textContent = "Publicando...";
-
-    try {
-      const attachment = item.attachments[0] || null;
-      const imageUrl = attachment
-        ? await fb.getDownloadURL(fb.storageRef(storage, attachment.ruta))
-        : null;
-
-      await fb.addDoc(fb.collection(db, "publicaciones"), {
-        seccion: "creaciones",
-        aporteId: item.id,
-        titulo: item.title,
-        descripcion: item.description,
-        autor: author,
-        archivo: attachment,
-        imagenUrl: imageUrl,
-        publicadoEn: fb.serverTimestamp()
-      });
-
-      publishedCreations.add(item.id);
-      statusHelp.textContent = "Creación publicada correctamente.";
-
-    } catch (error) {
-      console.error("No fue posible publicar la creación:", error);
-      statusHelp.textContent = "No fue posible publicar la creación. Inténtalo nuevamente.";
-
-    } finally {
-      updatePublishButton(item);
-      renderSubmissions();
     }
   });
 

@@ -2340,19 +2340,6 @@ button.stat-card.active {
   text-overflow: ellipsis;
 }
 
-#publishCreationButton {
-  margin-top: 18px;
-}
-
-#publishCreationButton:disabled {
-  cursor: default;
-
-  opacity: 1;
-
-  color: #3d5c45;
-
-  background: var(--green-light);
-}
 
 .editorial-note {
   margin-top: 30px;
