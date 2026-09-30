@@ -213,6 +213,7 @@
   </footer>
 
   <script src="../js/app.js"></script>
+  <script src="calendario-colegio.js"></script>
   <script type="module">
     const config={apiKey:"AIzaSyDWSpVS8It00pQXE7I541w-ywTu6mvphIM",authDomain:"michelangelo-comunidad.firebaseapp.com",projectId:"michelangelo-comunidad"};
     const list=document.querySelector('#list');
@@ -261,14 +262,17 @@
         day.append(weekday,number);
         const copy=document.createElement('div');copy.className='calendar-copy';
         const title=document.createElement('h4');title.textContent=item.titulo||'Actividad';copy.append(title);
-        const meta=[item.hora&&`${item.hora} h`,item.lugar].filter(Boolean).join(' · ');
+        const meta=[item.hora&&`${item.hora} h`,item.lugar,item.nivel].filter(Boolean).join(' · ');
         if(meta){const node=document.createElement('p');node.className='calendar-meta';node.textContent=meta;copy.append(node)}
         if(item.descripcion){const node=document.createElement('p');node.textContent=item.descripcion;copy.append(node)}
         event.append(day,copy);target.append(event);
       }
     };
-    onSnapshot(query(collection(db,'publicaciones'),where('seccion','==','calendario')),snapshot=>{
-      const items=snapshot.docs.map(doc=>doc.data()).filter(item=>!item.oculto&&/^\d{4}-\d{2}-\d{2}$/.test(item.fecha||''));
+    // Las actividades del calendario oficial del colegio (calendario-colegio.js)
+    // se muestran junto a las publicadas desde Studio.
+    const school=window.CALENDARIO_COLEGIO||[];
+    const showCalendar=published=>{
+      const items=[...school,...published].filter(item=>!item.oculto&&/^\d{4}-\d{2}-\d{2}$/.test(item.fecha||''));
       const byDate=(a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora||'').localeCompare(b.hora||'');
       const upcoming=items.filter(item=>item.fecha>=today).sort(byDate);
       const done=items.filter(item=>item.fecha<today).sort((a,b)=>byDate(b,a)).slice(0,12);
@@ -276,7 +280,11 @@
       else calendarState('No hay actividades próximas en el calendario. Vuelve pronto para conocer lo que viene.');
       past.hidden=!done.length;
       renderEvents(pastList,done);
-    },()=>calendarState('No fue posible cargar el calendario. Inténtalo nuevamente en unos minutos.',true));
+    };
+    if(school.length)showCalendar([]);
+    onSnapshot(query(collection(db,'publicaciones'),where('seccion','==','calendario')),
+      snapshot=>showCalendar(snapshot.docs.map(doc=>doc.data())),
+      ()=>{if(!school.length)calendarState('No fue posible cargar el calendario. Inténtalo nuevamente en unos minutos.',true)});
   </script>
 </body>
 </html>
