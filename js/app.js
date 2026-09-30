@@ -166,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <li><span aria-hidden="true">🎙️</span><div><strong>Podcast</strong>Conversaciones sobre lo que nos interesa, hechas por estudiantes.</div></li>
           <li><span aria-hidden="true">🎨</span><div><strong>Creaciones</strong>Arte, fotografía, literatura y música de estudiantes.</div></li>
           <li><span aria-hidden="true">🌱</span><div><strong>Comunidad</strong>Vida Michelangelo y el Centro de Estudiantes, con su calendario de actividades.</div></li>
+          <li><span aria-hidden="true">🤝</span><div><strong>Organización Estudiantil</strong>El Centro de Estudiantes recién está naciendo: para partir, somos una Organización Estudiantil que escucha, propone y organiza.</div></li>
           <li><span aria-hidden="true">💡</span><div><strong>Participa</strong>Cualquier estudiante puede enviar un artículo, una creación o una idea.</div></li>
         </ul>
 
