@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <ul class="welcome-list">
           <li><span aria-hidden="true">📰</span><div><strong>Periódico</strong>Noticias, entrevistas, opiniones y creaciones de la comunidad escolar: arte, fotografía, literatura y música. Cualquier estudiante puede participar enviando un artículo, una creación o una idea.</div></li>
           <li><span aria-hidden="true">🎙️</span><div><strong>Podcast</strong>Conversaciones sobre lo que nos interesa, hechas por estudiantes.</div></li>
-          <li><span aria-hidden="true">🌱</span><div><strong>Comunidad</strong>Vida Michelangelo y los lineamientos para participar y publicar.</div></li>
+          <li><span aria-hidden="true">🌱</span><div><strong>Vida Michelangelo</strong>Registros audiovisuales de las actividades de nuestro colegio.</div></li>
           <li><span aria-hidden="true">🤝</span><div><strong>Organización Estudiantil</strong>El Centro de Estudiantes recién está naciendo: para partir, somos una Organización Estudiantil que escucha, propone y organiza, con su calendario de actividades.</div></li>
         </ul>
 
