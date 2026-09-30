@@ -145,6 +145,10 @@
         <p class="section-label">CALENDARIO DE ACTIVIDADES</p>
         <h2 id="centerCalendarTitle">Lo que viene <em>en Michelangelo.</em></h2>
 
+        <div id="calendarNext" class="calendar-next" hidden></div>
+
+        <div id="calendarFilters" class="calendar-filters" aria-label="Filtrar actividades por mes" hidden></div>
+
         <div id="calendar" class="calendar-list" aria-live="polite">
           <p class="public-state">Cargando actividades…</p>
         </div>
@@ -242,41 +246,103 @@
     // Calendario: cada actividad guarda su fecha como AAAA-MM-DD y se interpreta
     // en la hora local, para que no cambie de día según la zona horaria.
     const calendar=document.querySelector('#calendar');
+    const next=document.querySelector('#calendarNext');
+    const filters=document.querySelector('#calendarFilters');
     const past=document.querySelector('#calendarPast');
     const pastList=document.querySelector('#calendarPastList');
-    const monthFormat=new Intl.DateTimeFormat('es-CL',{month:'long',year:'numeric'});
+    const monthFormat=new Intl.DateTimeFormat('es-CL',{month:'long'});
     const weekdayFormat=new Intl.DateTimeFormat('es-CL',{weekday:'short'});
+    const longFormat=new Intl.DateTimeFormat('es-CL',{weekday:'long',day:'numeric',month:'long'});
     const toDate=value=>{const [y,m,d]=value.split('-').map(Number);return new Date(y,m-1,d)};
     const pad=n=>String(n).padStart(2,'0');
     const now=new Date();const today=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-    const calendarState=(message,error=false)=>{calendar.replaceChildren();const node=document.createElement('p');node.className=`public-state${error?' error':''}`;node.textContent=message;calendar.append(node)};
+    const el=(tag,className,text)=>{const node=document.createElement(tag);if(className)node.className=className;if(text!=null)node.textContent=text;return node};
+    const calendarState=(message,error=false)=>{calendar.replaceChildren(el('p',`public-state${error?' error':''}`,message))};
+    // Tipo de actividad según su nombre; lo publicado desde Studio es del Centro.
+    const kinds=[
+      [/feriado|interferiado/i,'Feriado','holiday'],
+      [/teatro|lira|concierto|instrumentos/i,'Arte','art'],
+      [/tesis|proyecto|reuni[oó]n|escuela para padres|clases|buen trato/i,'Colegio','school']
+    ];
+    const kindOf=item=>{
+      if(item.centro)return ['Centro de Estudiantes','center'];
+      const match=kinds.find(([pattern])=>pattern.test(item.titulo||''));
+      return match?match.slice(1):['Comunidad','community'];
+    };
+    const daysUntil=fecha=>Math.round((toDate(fecha)-toDate(today))/86400000);
+    const relative=days=>days===0?'Hoy':days===1?'Mañana':days<14?`En ${days} días`:days<60?`En ${Math.round(days/7)} semanas`:`En ${Math.round(days/30)} meses`;
+    const monthKey=fecha=>fecha.slice(0,7);
+    const monthLabel=key=>monthFormat.format(toDate(`${key}-01`));
+    const byDate=(a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora||'').localeCompare(b.hora||'');
+    // Agrupa por mes y luego por día, para que cada fecha aparezca una sola vez.
     const renderEvents=(target,items)=>{
-      target.replaceChildren();let month='';
+      target.replaceChildren();
+      let group=null,row=null;
       for(const item of items){
-        const date=toDate(item.fecha);const label=monthFormat.format(date);
-        if(label!==month){month=label;const heading=document.createElement('h3');heading.className='calendar-month';heading.textContent=label;target.append(heading)}
-        const event=document.createElement('article');event.className='calendar-event';
-        const day=document.createElement('time');day.className='calendar-day';day.dateTime=item.fecha;
-        const weekday=document.createElement('small');weekday.textContent=weekdayFormat.format(date).replace('.','');
-        const number=document.createElement('strong');number.textContent=date.getDate();
-        day.append(weekday,number);
-        const copy=document.createElement('div');copy.className='calendar-copy';
-        const title=document.createElement('h4');title.textContent=item.titulo||'Actividad';copy.append(title);
+        const month=monthKey(item.fecha);
+        if(!group||group.dataset.month!==month){
+          group=el('section','calendar-group');group.dataset.month=month;
+          const count=items.filter(other=>monthKey(other.fecha)===month).length;
+          const header=el('header','calendar-month');
+          header.append(el('h3',null,monthLabel(month)),el('span',null,`${item.fecha.slice(0,4)} · ${count} ${count===1?'actividad':'actividades'}`));
+          group.append(header);target.append(group);row=null;
+        }
+        if(!row||row.dataset.date!==item.fecha){
+          const date=toDate(item.fecha);
+          row=el('article','calendar-date');row.dataset.date=item.fecha;
+          const day=el('time','calendar-day');day.dateTime=item.fecha;
+          day.append(el('small',null,weekdayFormat.format(date).replace('.','')),el('strong',null,date.getDate()));
+          if(item.fecha===today){row.classList.add('is-today');day.append(el('span','calendar-today','Hoy'))}
+          row.append(day,el('ul','calendar-events'));group.append(row);
+        }
+        const [kind,kindClass]=kindOf(item);
+        if(kindClass==='holiday')row.classList.add('is-holiday');
+        const event=el('li','calendar-event');
+        event.append(el('span',`calendar-tag tag-${kindClass}`,kind),el('h4',null,item.titulo||'Actividad'));
         const meta=[item.hora&&`${item.hora} h`,item.lugar,item.nivel].filter(Boolean).join(' · ');
-        if(meta){const node=document.createElement('p');node.className='calendar-meta';node.textContent=meta;copy.append(node)}
-        if(item.descripcion){const node=document.createElement('p');node.textContent=item.descripcion;copy.append(node)}
-        event.append(day,copy);target.append(event);
+        if(meta)event.append(el('p','calendar-meta',meta));
+        if(item.descripcion)event.append(el('p',null,item.descripcion));
+        row.lastChild.append(event);
+      }
+    };
+    const renderNext=items=>{
+      next.hidden=!items.length;next.replaceChildren();
+      if(!items.length)return;
+      const item=items[0];const date=toDate(item.fecha);
+      const sameDay=items.filter(other=>other.fecha===item.fecha).length-1;
+      const day=el('time','calendar-next-day');day.dateTime=item.fecha;
+      day.append(el('small',null,monthFormat.format(date).slice(0,3)),el('strong',null,date.getDate()));
+      const copy=el('div','calendar-next-copy');
+      const label=el('p','calendar-next-label','Próxima actividad');
+      label.append(el('span',null,relative(daysUntil(item.fecha))));
+      copy.append(label,el('h3',null,item.titulo||'Actividad'));
+      copy.append(el('p','calendar-next-meta',[longFormat.format(date),item.hora&&`${item.hora} h`,item.lugar,item.nivel].filter(Boolean).join(' · ')));
+      if(sameDay)copy.append(el('p','calendar-next-more',`y ${sameDay} ${sameDay===1?'actividad más':'actividades más'} ese día`));
+      next.append(day,copy);
+    };
+    let upcoming=[],activeMonth='todos';
+    const renderUpcoming=()=>renderEvents(calendar,activeMonth==='todos'?upcoming:upcoming.filter(item=>monthKey(item.fecha)===activeMonth));
+    const renderFilters=()=>{
+      const months=[...new Set(upcoming.map(item=>monthKey(item.fecha)))];
+      if(!months.includes(activeMonth))activeMonth='todos';
+      filters.hidden=months.length<2;filters.replaceChildren();
+      for(const key of ['todos',...months]){
+        const button=el('button','calendar-filter',key==='todos'?'Todos':monthLabel(key));
+        button.type='button';button.setAttribute('aria-pressed',String(key===activeMonth));
+        button.append(el('span',null,key==='todos'?upcoming.length:upcoming.filter(item=>monthKey(item.fecha)===key).length));
+        button.addEventListener('click',()=>{activeMonth=key;renderFilters();renderUpcoming()});
+        filters.append(button);
       }
     };
     // Las actividades del calendario oficial del colegio (calendario-colegio.js)
     // se muestran junto a las publicadas desde Studio.
     const school=window.CALENDARIO_COLEGIO||[];
     const showCalendar=published=>{
-      const items=[...school,...published].filter(item=>!item.oculto&&/^\d{4}-\d{2}-\d{2}$/.test(item.fecha||''));
-      const byDate=(a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora||'').localeCompare(b.hora||'');
-      const upcoming=items.filter(item=>item.fecha>=today).sort(byDate);
+      const items=[...school,...published.map(item=>({...item,centro:true}))].filter(item=>!item.oculto&&/^\d{4}-\d{2}-\d{2}$/.test(item.fecha||''));
+      upcoming=items.filter(item=>item.fecha>=today).sort(byDate);
       const done=items.filter(item=>item.fecha<today).sort((a,b)=>byDate(b,a)).slice(0,12);
-      if(upcoming.length)renderEvents(calendar,upcoming);
+      renderNext(upcoming);renderFilters();
+      if(upcoming.length)renderUpcoming();
       else calendarState('No hay actividades próximas en el calendario. Vuelve pronto para conocer lo que viene.');
       past.hidden=!done.length;
       renderEvents(pastList,done);
