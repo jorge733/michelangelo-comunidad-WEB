@@ -27,6 +27,13 @@ service cloud.firestore {
         || (seccion in ['centro', 'calendario'] && hasRole(['centro']));
     }
 
+    // Qué rol revisa cada tipo de aporte de Participa. Studio consulta
+    // filtrando por «tipo», así que las listas deben coincidir con studio.js.
+    function canReviewAporte(tipo) {
+      return (tipo in ['periodico', 'creacion', 'podcast', 'idea'] && hasRole(['editorial']))
+        || (tipo == 'centro' && hasRole(['centro']));
+    }
+
     function validMember(data) {
       return data.keys().hasOnly(['rol', 'correo', 'actualizadoEn', 'actualizadoPor'])
         && data.rol in ['admin', 'editorial', 'centro', 'audiovisual']
@@ -60,7 +67,7 @@ service cloud.firestore {
         ])
         && request.resource.data.get('contacto', '') is string
         && request.resource.data.get('contacto', '').size() <= 200
-        && request.resource.data.tipo in ['periodico', 'creacion', 'podcast', 'idea']
+        && request.resource.data.tipo in ['periodico', 'creacion', 'podcast', 'idea', 'centro']
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.nombre is string
         && request.resource.data.nombre.size() <= 120
@@ -76,11 +83,11 @@ service cloud.firestore {
         && request.resource.data.quiereParticipar is bool
         && request.resource.data.creadoEn == request.time;
 
-      allow read: if hasRole(['editorial']);
+      allow read: if hasRole([]) || canReviewAporte(resource.data.tipo);
       // Studio solo puede cambiar el estado editorial y su nota interna; el
       // aporte conserva siempre su información original y su preferencia de
       // anonimato.
-      allow update: if hasRole(['editorial'])
+      allow update: if canReviewAporte(resource.data.tipo)
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['estado', 'notaEditorial', 'actualizadoEn', 'actualizadoPor'])
         && request.resource.data.estado in ['pendiente', 'revision', 'aprobado', 'rechazado']

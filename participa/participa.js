@@ -324,6 +324,53 @@ const forms = {
         label: "Me gustaría ayudar a llevar esta idea a cabo."
       }
     ]
+  },
+
+  centro: {
+    label: "CENTRO DE ESTUDIANTES",
+    cardTitle: "Propuesta al Centro de Estudiantes",
+    title: "Tu propuesta también construye el colegio.",
+    description: "Plantéale al Centro de Estudiantes una actividad, una mejora o una inquietud.",
+    heading: "Tu propuesta",
+    help: "La Organización Estudiantil revisa cada propuesta. Si dejas tu correo, podrá contactarte.",
+    fields: [
+      {
+        name: "proposalTitle",
+        type: "text",
+        label: "Ponle un nombre a tu propuesta",
+        required: true,
+        maxlength: 200,
+        full: true
+      },
+      {
+        name: "categoriaPropuesta",
+        type: "select",
+        label: "¿De qué se trata?",
+        required: true,
+        full: true,
+        options: ["Actividad o evento", "Mejora para el colegio", "Inquietud o problema", "Otro"]
+      },
+      {
+        name: "proposalDescription",
+        type: "textarea",
+        label: "Cuéntanos tu propuesta",
+        required: true,
+        maxlength: 5000,
+        placeholder: "¿Qué propones? ¿Cómo podría funcionar?"
+      },
+      {
+        name: "porQueImportante",
+        type: "textarea",
+        label: "¿Por qué es importante para el colegio?",
+        maxlength: 2000,
+        short: true
+      },
+      {
+        name: "quiereAyudar",
+        type: "check",
+        label: "Me gustaría ayudar a llevar esta propuesta a cabo."
+      }
+    ]
   }
 
 };
@@ -1001,7 +1048,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return Boolean(details.participacion) && details.participacion !== "Solo propongo el tema";
     }
 
-    if (type === "idea") {
+    if (type === "idea" || type === "centro") {
       return details.quiereAyudar === true;
     }
 

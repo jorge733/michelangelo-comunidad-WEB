@@ -537,6 +537,17 @@ img {
   border-bottom: 1px solid var(--border);
 }
 
+/* La quinta tarjeta ocupa todo el ancho para cerrar la cuadrícula. */
+.category-card:nth-child(5) {
+  grid-column: 1 / -1;
+
+  min-height: 0;
+
+  border-right: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+
 .category-card:hover {
   z-index: 2;
 
@@ -555,6 +566,10 @@ img {
 
 .category-card:nth-child(4):hover {
   background: var(--terracotta-light);
+}
+
+.category-card:nth-child(5):hover {
+  background: var(--blue-light);
 }
 
 .category-top {

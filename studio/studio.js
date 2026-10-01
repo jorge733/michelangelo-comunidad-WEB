@@ -98,7 +98,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     periodico: { label: "PERIÓDICO", icon: "✎", title: "Aportes para el periódico" },
     creacion: { label: "CREACIÓN", icon: "◇", title: "Creaciones" },
     podcast: { label: "PODCAST", icon: "◉", title: "Propuestas para el podcast" },
-    idea: { label: "IDEA", icon: "✦", title: "Ideas para la comunidad" }
+    idea: { label: "IDEA", icon: "✦", title: "Ideas para la comunidad" },
+    centro: { label: "CENTRO", icon: "◎", title: "Propuestas al Centro de Estudiantes" }
   };
 
   const statusInfo = {
@@ -108,23 +109,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     rechazado: { label: "RECHAZADO", plural: "Rechazados" }
   };
 
-  // Vistas de Studio que ve cada rol. Deben coincidir con firestore.rules
-  // y storage.rules, que son las que realmente protegen los datos.
+  // Vistas de Studio que ve cada rol y qué tipos de aportes revisa en la
+  // bandeja. Deben coincidir con firestore.rules y storage.rules, que son
+  // las que realmente protegen los datos.
   const roleInfo = {
     admin: {
       label: "Administración",
       help: "Todo Studio, y además administra el equipo y sus roles.",
-      views: ["inbox", "video", "centro", "calendario", "equipo"]
+      views: ["inbox", "video", "centro", "calendario", "equipo"],
+      aportes: Object.keys(typeInfo)
     },
     editorial: {
       label: "Equipo editorial",
       help: "Revisa los aportes de Participa, incluidas las creaciones para el Periódico.",
-      views: ["inbox"]
+      views: ["inbox"],
+      aportes: ["periodico", "creacion", "podcast", "idea"]
     },
     centro: {
       label: "Centro de Estudiantes",
-      help: "Publica comunicados y administra el calendario de actividades.",
-      views: ["centro", "calendario"]
+      help: "Publica comunicados, administra el calendario y revisa las propuestas de estudiantes.",
+      views: ["centro", "calendario", "inbox"],
+      aportes: ["centro"]
     },
     audiovisual: {
       label: "Audiovisual",
@@ -159,7 +164,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     porQueInteresante: "Por qué sería interesante",
     ideaReason: "Por qué sería interesante",
     recursos: "Qué se necesitaría",
-    quiereAyudar: "Quiere ayudar a realizarla"
+    quiereAyudar: "Quiere ayudar a realizarla",
+    categoriaPropuesta: "Tipo de propuesta",
+    porQueImportante: "Por qué es importante"
   };
 
   const hiddenDetails = ["borrador", "archivo", "archivos"];
@@ -532,6 +539,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     return Boolean(currentRole && roleInfo[currentRole].views.includes(view));
   }
 
+  // "todos" siempre está disponible; cada tipo, solo si el rol lo revisa.
+  function reviews(filter) {
+    return filter === "todos" || Boolean(currentRole && roleInfo[currentRole].aportes?.includes(filter));
+  }
+
   function applyRole(role, user) {
     if (role === currentRole) return;
 
@@ -539,8 +551,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     showStudio(user);
 
     navItems.forEach(button => {
-      button.hidden = !can(button.dataset.view || "inbox");
+      button.hidden = button.dataset.view
+        ? !can(button.dataset.view)
+        : !can("inbox") || !reviews(button.dataset.filter);
     });
+
+    filters.forEach(button => {
+      button.hidden = !reviews(button.dataset.filter);
+    });
+
+    if (!reviews(currentFilter)) setFilter("todos");
 
     navGroupLabels.forEach(label => {
       const group = label.dataset.navGroup;
@@ -614,8 +634,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     submissionList.innerHTML = "";
     emptyState.classList.remove("active");
 
+    // Administración lee todo; los demás roles solo los tipos que revisan,
+    // porque firestore.rules rechaza cualquier consulta más amplia.
+    const aportes = fb.collection(db, "aportes");
+    const source = currentRole === "admin"
+      ? aportes
+      : fb.query(aportes, fb.where("tipo", "in", roleInfo[currentRole].aportes));
+
     unsubscribeSubmissions = fb.onSnapshot(
-      fb.collection(db, "aportes"),
+      source,
       snapshot => {
         submissions = snapshot.docs.map(firestoreToSubmission);
         studioLoading.hidden = true;

@@ -562,7 +562,7 @@ img {
 .projects-grid {
   display: grid;
 
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 
   gap: 18px;
 }
@@ -604,6 +604,10 @@ img {
 
 .community-card {
   background: var(--blue-light);
+}
+
+.center-card {
+  background: var(--ochre-light);
 }
 
 .project-number {
@@ -657,13 +661,53 @@ img {
   color: rgba(37, 49, 43, 0.74);
 }
 
+.project-actions {
+  margin-top: 28px;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: 12px 22px;
+}
+
 .project-link {
   display: inline-block;
 
-  margin-top: 28px;
-
   font-size: 0.82rem;
   font-weight: 700;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Toda la tarjeta lleva a su sección; el enlace para participar queda encima. */
+.project-link::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+}
+
+.project-participate {
+  position: relative;
+  z-index: 1;
+
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  opacity: 0.75;
+
+  transition: opacity 0.2s ease;
+}
+
+.project-participate:hover,
+.project-participate:focus-visible {
+  opacity: 1;
 }
 
 .project-link span {
