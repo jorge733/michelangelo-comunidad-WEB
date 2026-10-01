@@ -36,6 +36,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
       onAuthStateChanged: authModule.onAuthStateChanged,
       signOut: authModule.signOut,
+      EmailAuthProvider: authModule.EmailAuthProvider,
+      reauthenticateWithCredential: authModule.reauthenticateWithCredential,
+      updatePassword: authModule.updatePassword,
       collection: firestoreModule.collection,
       addDoc: firestoreModule.addDoc,
       onSnapshot: firestoreModule.onSnapshot,
@@ -474,6 +477,104 @@ document.addEventListener("DOMContentLoaded", async () => {
   togglePassword.addEventListener("click", () => {
     setPasswordVisible(loginPassword.type === "password");
     loginPassword.focus();
+  });
+
+  /* =====================================================
+     CAMBIAR CONTRASEÑA
+  ====================================================== */
+
+  const passwordButton = $("passwordButton");
+  const passwordDialog = $("passwordDialog");
+  const passwordForm = $("passwordForm");
+  const currentPassword = $("currentPassword");
+  const newPassword = $("newPassword");
+  const confirmPassword = $("confirmPassword");
+  const passwordError = $("passwordError");
+  const passwordSuccess = $("passwordSuccess");
+  const passwordSubmit = $("passwordSubmit");
+
+  const passwordErrors = {
+    "auth/wrong-password": "La contraseña actual no es correcta.",
+    "auth/invalid-credential": "La contraseña actual no es correcta.",
+    "auth/weak-password": "La nueva contraseña es demasiado débil. Usa al menos 8 caracteres.",
+    "auth/too-many-requests": "Demasiados intentos. Espera unos minutos e inténtalo nuevamente.",
+    "auth/network-request-failed": "No hay conexión. Revisa tu internet e inténtalo nuevamente."
+  };
+
+  function showPasswordError(message) {
+    passwordError.textContent = message;
+    passwordError.classList.toggle("active", Boolean(message));
+  }
+
+  passwordButton.addEventListener("click", () => {
+    passwordForm.reset();
+    showPasswordError("");
+    passwordSuccess.textContent = "";
+    passwordSubmit.disabled = false;
+    closeSidebar();
+    passwordDialog.showModal();
+    currentPassword.focus();
+  });
+
+  $("passwordCancel").addEventListener("click", () => passwordDialog.close());
+
+  passwordDialog.addEventListener("click", event => {
+    if (event.target === passwordDialog) passwordDialog.close();
+  });
+
+  passwordForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    showPasswordError("");
+    passwordSuccess.textContent = "";
+
+    const user = auth.currentUser;
+
+    if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+      showPasswordError("Completa los tres campos.");
+      return;
+    }
+
+    if (newPassword.value.length < 8) {
+      showPasswordError("La nueva contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
+    if (newPassword.value !== confirmPassword.value) {
+      showPasswordError("Las contraseñas nuevas no coinciden.");
+      return;
+    }
+
+    if (newPassword.value === currentPassword.value) {
+      showPasswordError("La nueva contraseña debe ser distinta de la actual.");
+      return;
+    }
+
+    if (!user?.email) {
+      showPasswordError("Tu sesión expiró. Vuelve a iniciar sesión.");
+      return;
+    }
+
+    passwordSubmit.disabled = true;
+
+    try {
+      // Firebase exige un inicio de sesión reciente para cambiar la contraseña.
+      const credential = fb.EmailAuthProvider.credential(user.email, currentPassword.value);
+      await fb.reauthenticateWithCredential(user, credential);
+      await fb.updatePassword(user, newPassword.value);
+
+      passwordForm.reset();
+      passwordSuccess.textContent = "Listo. Tu contraseña se cambió correctamente.";
+      setTimeout(() => {
+        if (passwordDialog.open) passwordDialog.close();
+      }, 1800);
+
+    } catch (error) {
+      console.error("No fue posible cambiar la contraseña:", error);
+      showPasswordError(passwordErrors[error.code] || "No fue posible cambiar la contraseña. Inténtalo nuevamente.");
+
+    } finally {
+      passwordSubmit.disabled = false;
+    }
   });
 
   logoutButton.addEventListener("click", async () => {

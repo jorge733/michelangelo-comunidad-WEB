@@ -305,6 +305,15 @@
         <button
           type="button"
           class="logout-button"
+          id="passwordButton"
+        >
+          Cambiar contraseña
+        </button>
+
+
+        <button
+          type="button"
+          class="logout-button"
           id="logoutButton"
         >
           Cerrar sesión
@@ -1179,6 +1188,53 @@
     </article>
 
   </div>
+
+
+
+  <!-- CAMBIAR CONTRASEÑA -->
+
+  <dialog class="password-dialog" id="passwordDialog" aria-labelledby="passwordDialogTitle">
+
+    <form class="login-form" id="passwordForm" novalidate>
+
+      <div>
+        <p class="login-eyebrow">TU CUENTA</p>
+        <h2 id="passwordDialogTitle">Cambiar contraseña</h2>
+        <p class="password-dialog-help">
+          Por seguridad, confirma tu contraseña actual antes de elegir una nueva.
+        </p>
+      </div>
+
+      <div class="login-field">
+        <label for="currentPassword">Contraseña actual</label>
+        <input type="password" id="currentPassword" autocomplete="current-password" required>
+      </div>
+
+      <div class="login-field">
+        <label for="newPassword">Nueva contraseña</label>
+        <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required aria-describedby="newPasswordHint">
+        <small class="password-dialog-hint" id="newPasswordHint">Al menos 8 caracteres.</small>
+      </div>
+
+      <div class="login-field">
+        <label for="confirmPassword">Repite la nueva contraseña</label>
+        <input type="password" id="confirmPassword" autocomplete="new-password" minlength="8" required>
+      </div>
+
+      <p class="login-error" id="passwordError" role="alert"></p>
+      <p class="password-success" id="passwordSuccess" role="status"></p>
+
+      <div class="password-dialog-actions">
+        <button type="button" class="password-cancel" id="passwordCancel">Cancelar</button>
+        <button type="submit" class="login-button" id="passwordSubmit">
+          Guardar contraseña
+          <span>→</span>
+        </button>
+      </div>
+
+    </form>
+
+  </dialog>
 
 
 
