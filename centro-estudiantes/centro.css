@@ -107,6 +107,16 @@
   border-bottom: 1px solid var(--border);
 }
 
+.center-team-list li span {
+  display: block;
+  margin-top: 2px;
+
+  font-family: var(--sans);
+  font-size: 0.8rem;
+
+  color: var(--ink-soft);
+}
+
 
 /* =========================================================
    QUÉ HACEMOS
