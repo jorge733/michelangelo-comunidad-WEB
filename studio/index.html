@@ -6,6 +6,14 @@
 
   <title>Michelangelo Studio</title>
 
+  <!-- La dirección del Studio es /studio, sin barra final. Las rutas de esta
+       página son absolutas para que funcione con o sin ella. -->
+  <script>
+    if (location.pathname.endsWith("/studio/")) {
+      history.replaceState(null, "", location.pathname.slice(0, -1) + location.search + location.hash);
+    }
+  </script>
+
   <meta
     name="description"
     content="Panel editorial de Michelangelo Comunidad."
@@ -14,10 +22,10 @@
   <link
     rel="icon"
     type="image/jpeg"
-    href="../assets/logo-michelangelo.jpg"
+    href="/assets/logo-michelangelo.jpg"
   >
 
-  <link rel="stylesheet" href="studio.css">
+  <link rel="stylesheet" href="/studio/studio.css">
 </head>
 
 <body>
@@ -33,7 +41,7 @@
       <div class="login-brand">
 
         <img
-          src="../assets/logo-michelangelo.jpg"
+          src="/assets/logo-michelangelo.jpg"
           alt="Michelangelo Colegio Waldorf"
         >
 
@@ -135,7 +143,7 @@
             Acceso exclusivo para usuarios autorizados.
           </span>
 
-          <a href="../">
+          <a href="/">
             ← Volver a Michelangelo Comunidad
           </a>
 
@@ -166,7 +174,7 @@
       <div class="sidebar-brand">
 
         <img
-          src="../assets/logo-michelangelo.jpg"
+          src="/assets/logo-michelangelo.jpg"
           alt="Michelangelo Colegio Waldorf"
         >
 
@@ -320,7 +328,7 @@
         </button>
 
 
-        <a href="../">
+        <a href="/">
           ← Volver a Comunidad
         </a>
 
@@ -1238,7 +1246,7 @@
 
 
 
-  <script src="studio.js"></script>
+  <script src="/studio/studio.js"></script>
 
 </body>
 </html>

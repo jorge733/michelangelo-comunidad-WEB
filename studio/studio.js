@@ -1458,7 +1458,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       videoFileInfo.hidden = true;
       videoProgress.hidden = true;
       videoPublishMessage.innerHTML =
-        'Video publicado correctamente. <a class="text-link" href="../vida/" target="_blank" rel="noopener">Ver en Vida Michelangelo →</a>';
+        'Video publicado correctamente. <a class="text-link" href="/vida/" target="_blank" rel="noopener">Ver en Vida Michelangelo →</a>';
 
     } catch (error) {
       console.error("No fue posible publicar el video:", error);
@@ -1505,7 +1505,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       centerPublishForm.reset();
       centerPublishMessage.innerHTML =
-        'Comunicado publicado correctamente. <a class="text-link" href="../centro-estudiantes/#comunicados" target="_blank" rel="noopener">Ver en Centro de Estudiantes →</a>';
+        'Comunicado publicado correctamente. <a class="text-link" href="/centro-estudiantes/#comunicados" target="_blank" rel="noopener">Ver en Centro de Estudiantes →</a>';
 
     } catch (error) {
       console.error("No fue posible publicar el comunicado:", error);
@@ -1643,7 +1643,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       calendarPublishForm.reset();
       calendarPublishMessage.innerHTML =
-        'Actividad agregada. <a class="text-link" href="../centro-estudiantes/#calendario" target="_blank" rel="noopener">Ver el calendario →</a>';
+        'Actividad agregada. <a class="text-link" href="/centro-estudiantes/#calendario" target="_blank" rel="noopener">Ver el calendario →</a>';
 
     } catch (error) {
       console.error("No fue posible agregar la actividad:", error);
