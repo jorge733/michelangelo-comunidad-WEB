@@ -621,7 +621,7 @@ document.addEventListener("DOMContentLoaded", () => {
     closeForm.addEventListener("click", closeCurrentForm);
   }
 
-  // Enlace directo a un formulario: /participa/?tipo=podcast
+  // Enlace directo a un formulario: /participa?tipo=podcast
   const requestedType = new URLSearchParams(window.location.search).get("tipo");
 
   if (forms[requestedType]) {

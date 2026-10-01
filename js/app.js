@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="welcome-actions">
           <button class="button button-primary welcome-start" type="button">Comenzar a explorar</button>
-          <a class="button button-secondary" href="${new URL("participa/", siteRoot).href}">Quiero participar</a>
+          <a class="button button-secondary" href="${new URL("participa", siteRoot).href}">Quiero participar</a>
         </div>
       </div>`;
 

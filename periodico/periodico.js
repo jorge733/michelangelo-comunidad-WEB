@@ -33,7 +33,7 @@
   ========================== */
 
   const pagePath = (edicion, number) =>
-    `ediciones/${edicion.id}/pagina-${String(number).padStart(2, "0")}.jpg`;
+    `/periodico/ediciones/${edicion.id}/pagina-${String(number).padStart(2, "0")}.jpg`;
 
   const setText = (id, text) => {
     const element = document.getElementById(id);
@@ -254,7 +254,7 @@
   // iOS ignora el volumen de los elementos <audio>, así que el sonido se
   // reproduce con Web Audio y un control de ganancia. El contexto se crea con
   // el primer toque o clic, como exigen los navegadores móviles.
-  const pageSound = new Audio("pasar-pagina.mp3");
+  const pageSound = new Audio("/periodico/pasar-pagina.mp3");
   pageSound.preload = "auto";
   pageSound.volume = SOUND_VOLUME;
 
@@ -266,7 +266,7 @@
     if (audioContext || !Context) return;
 
     audioContext = new Context();
-    fetch("pasar-pagina.mp3")
+    fetch("/periodico/pasar-pagina.mp3")
       .then((response) => response.arrayBuffer())
       .then((data) => audioContext.decodeAudioData(data))
       .then((buffer) => (soundBuffer = buffer))

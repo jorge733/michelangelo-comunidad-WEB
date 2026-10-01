@@ -6,14 +6,6 @@
 
   <title>Michelangelo Studio</title>
 
-  <!-- La dirección del Studio es /studio, sin barra final. Las rutas de esta
-       página son absolutas para que funcione con o sin ella. -->
-  <script>
-    if (location.pathname.endsWith("/studio/")) {
-      history.replaceState(null, "", location.pathname.slice(0, -1) + location.search + location.hash);
-    }
-  </script>
-
   <meta
     name="description"
     content="Panel editorial de Michelangelo Comunidad."

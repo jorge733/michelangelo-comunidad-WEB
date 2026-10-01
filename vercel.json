@@ -1,6 +1,7 @@
 {
+  "trailingSlash": false,
   "redirects": [
-    { "source": "/creaciones", "destination": "/periodico/", "permanent": true },
-    { "source": "/creaciones/(.*)", "destination": "/periodico/", "permanent": true }
+    { "source": "/creaciones", "destination": "/periodico", "permanent": true },
+    { "source": "/creaciones/(.*)", "destination": "/periodico", "permanent": true }
   ]
 }
