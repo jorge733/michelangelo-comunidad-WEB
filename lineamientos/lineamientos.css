@@ -414,6 +414,30 @@ html {
   color: var(--ink) !important;
 }
 
+.guide-doc {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.guide-doc p {
+  margin: 0;
+}
+
+.guide-doc-actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+.guide-doc-actions .button {
+  margin-top: 0;
+}
+
 .check-list,
 .warning-list {
   list-style: none;
